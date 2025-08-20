@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 import { updateProduct } from "../actions"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,13 +35,14 @@ interface Props {
 export default function EditForm({ product }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const updateProductWithId = updateProduct.bind(null, product.id)
+  const t = useTranslations("ProductEditForm")
 
   if (!isEditing) {
     return (
       <div className="mt-6">
         <Button onClick={() => setIsEditing(true)}>
           <Pencil className="mr-2 h-4 w-4" />
-          แก้ไขข้อมูลสินค้า
+          {t("editFormButton")}
         </Button>
       </div>
     )
@@ -50,15 +52,15 @@ export default function EditForm({ product }: Props) {
     <form action={updateProductWithId}>
       <Card className="mt-6">
         <CardHeader>
-          <CardTitle>แก้ไขข้อมูลสินค้า</CardTitle>
+          <CardTitle>{t("editFormTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1">
-            <Label htmlFor="name">ชื่อสินค้า/บริการ</Label>
+            <Label htmlFor="name">{t("editFormName")}</Label>
             <Input id="name" name="name" defaultValue={product.name} required />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="description">คำอธิบาย</Label>
+            <Label htmlFor="description">{t("editFormDescription")}</Label>
             <Textarea
               id="description"
               name="description"
@@ -67,7 +69,7 @@ export default function EditForm({ product }: Props) {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <Label htmlFor="thickness">ความหนา (มม.)</Label>
+              <Label htmlFor="thickness">{t("editFormThickness")}</Label>
               <Input
                 id="thickness"
                 name="thickness"
@@ -77,7 +79,7 @@ export default function EditForm({ product }: Props) {
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="width">ความกว้าง (มม.)</Label>
+              <Label htmlFor="width">{t("editFormWidth")}</Label>
               <Input
                 id="width"
                 name="width"
@@ -88,7 +90,7 @@ export default function EditForm({ product }: Props) {
             </div>
 
             <div className="space-y-1">
-              <Label htmlFor="length">ความยาว (ม.)</Label>
+              <Label htmlFor="length">{t("editFormLength")}</Label>
               <Input
                 id="length"
                 name="length"
@@ -100,7 +102,7 @@ export default function EditForm({ product }: Props) {
           </div>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-1">
-              <Label htmlFor="price">ราคา</Label>
+              <Label htmlFor="price">{t("editFormPrice")}</Label>
               <Input
                 id="price"
                 name="price"
@@ -111,7 +113,9 @@ export default function EditForm({ product }: Props) {
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="stock_quantity">จำนวนในสต็อก</Label>
+              <Label htmlFor="stock_quantity">
+                {t("editFormStockQuantity")}
+              </Label>
               <Input
                 id="stock_quantity"
                 name="stock_quantity"
@@ -122,7 +126,9 @@ export default function EditForm({ product }: Props) {
               />
             </div>
             <div className="space-y-1">
-              <Label htmlFor="low_stock_threshold">จุดสั่งซื้อขั้นต่ำ</Label>
+              <Label htmlFor="low_stock_threshold">
+                {t("editFormLowStockThreshold")}
+              </Label>
               <Input
                 id="low_stock_threshold"
                 name="low_stock_threshold"
@@ -139,9 +145,9 @@ export default function EditForm({ product }: Props) {
             variant="ghost"
             onClick={() => setIsEditing(false)}
           >
-            ยกเลิก
+            {t("editFormCancel")}
           </Button>
-          <Button type="submit">บันทึกการเปลี่ยนแปลง</Button>
+          <Button type="submit">{t("editFormSaveButton")}</Button>
         </CardFooter>
       </Card>
     </form>

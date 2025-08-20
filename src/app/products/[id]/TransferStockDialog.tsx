@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import { transferStock } from "../actions"
 import { Button } from "@/components/ui/button"
@@ -38,6 +39,8 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
   const [isOpen, setIsOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  const t = useTranslations("TransferStockDialog")
+
   const [fromWarehouseId, setFromWarehouseId] = useState<string>("")
   const [toWarehouseId, setToWarehouseId] = useState<string>("")
   const [quantity, setQuantity] = useState("")
@@ -46,15 +49,15 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
   const handleFormSubmit = () => {
     // Basic validation
     if (!fromWarehouseId || !toWarehouseId || !quantity) {
-      alert("กรุณากรอกข้อมูลให้ครบถ้วน")
+      alert(t("alertFillAllFields"))
       return
     }
     if (fromWarehouseId === toWarehouseId) {
-      alert("คลังสินค้าต้นทางและปลายทางต้องแตกต่างกัน")
+      alert(t("alertDifferentWarehouses"))
       return
     }
     if (Number(quantity) <= 0) {
-      alert("จำนวนต้องมากกว่า 0")
+      alert(t("alertQuantityMoreThanZero"))
       return
     }
 
@@ -68,7 +71,7 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
     startTransition(async () => {
       const result = await transferStock(formData)
       if (result.success) {
-        alert("ย้ายสินค้าสำเร็จ!")
+        alert(t("alertMoveStockSuccess"))
         setIsOpen(false)
         // Reset form
         setFromWarehouseId("")
@@ -76,7 +79,7 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
         setQuantity("")
         setNotes("")
       } else {
-        alert(`เกิดข้อผิดพลาด: ${result.error}`)
+        alert(t("alertMoveStockError") + `: ${result.error}`)
       }
     })
   }
@@ -86,22 +89,24 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
       <DialogTrigger asChild>
         <Button variant="outline">
           <ArrowRightLeft className="mr-2 h-4 w-4" />
-          ย้ายสินค้า
+          {t("buttonTitle")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>ย้ายสินค้าระหว่างคลัง</DialogTitle>
-          <DialogDescription>
-            เลือกคลังต้นทาง, ปลายทาง, และจำนวนที่ต้องการย้าย
-          </DialogDescription>
+          <DialogTitle>{t("dialogTitle")}</DialogTitle>
+          <DialogDescription>{t("dialogDescription")}</DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="fromWarehouse">จากคลังสินค้า</Label>
-            <Select required value={fromWarehouseId} onValueChange={setFromWarehouseId}>
+            <Label htmlFor="fromWarehouse">{t("fromWarehouse")}</Label>
+            <Select
+              required
+              value={fromWarehouseId}
+              onValueChange={setFromWarehouseId}
+            >
               <SelectTrigger id="fromWarehouse">
-                <SelectValue placeholder="-- เลือกคลังต้นทาง --" />
+                <SelectValue placeholder={t("fromWarehousePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {warehouses.map((wh) => (
@@ -113,10 +118,14 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="toWarehouse">ไปยังคลังสินค้า</Label>
-            <Select required value={toWarehouseId} onValueChange={setToWarehouseId}>
+            <Label htmlFor="toWarehouse">{t("toWarehouse")}</Label>
+            <Select
+              required
+              value={toWarehouseId}
+              onValueChange={setToWarehouseId}
+            >
               <SelectTrigger id="toWarehouse">
-                <SelectValue placeholder="-- เลือกคลังปลายทาง --" />
+                <SelectValue placeholder={t("toWarehousePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {warehouses
@@ -130,33 +139,35 @@ export default function TransferStockDialog({ productId, warehouses }: Props) {
             </Select>
           </div>
           <div className="space-y-1">
-            <Label htmlFor="quantity">จำนวนที่ย้าย</Label>
+            <Label htmlFor="quantity">{t("quantityToTransfer")}</Label>
             <Input
               id="quantity"
               name="quantity"
               type="number"
-              placeholder="จำนวน"
+              placeholder={t("quantityToTransfer")}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="notes">หมายเหตุ</Label>
+            <Label htmlFor="notes">{t("notesPlaceholder")}</Label>
             <Textarea
               id="notes"
               name="notes"
-              placeholder="เหตุผลในการย้าย (ถ้ามี)"
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={() => setIsOpen(false)}>ยกเลิก</Button>
+          <Button variant="ghost" onClick={() => setIsOpen(false)}>
+            {t("cancelButton")}
+          </Button>
           <Button onClick={handleFormSubmit} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            ยืนยันการย้าย
+            {t("confirmButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

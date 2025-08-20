@@ -2,6 +2,7 @@
 
 import { deleteInvoice } from "../actions"
 import { Trash2 } from "lucide-react"
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import {
   AlertDialog,
@@ -21,29 +22,26 @@ export default function DeleteInvoiceButton({
   invoiceId: number
 }) {
   const deleteInvoiceWithId = deleteInvoice.bind(null, invoiceId)
-
+  const t = useTranslations("DeleteDialog")
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive">
           <Trash2 size={16} className="mr-2" />
-          ลบ
+          {t("deleteInvoice")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <form action={deleteInvoiceWithId}>
           <AlertDialogHeader>
-            <AlertDialogTitle>คุณแน่ใจหรือไม่?</AlertDialogTitle>
-            <AlertDialogDescription>
-              การกระทำนี้ไม่สามารถย้อนกลับได้
-              ระบบจะทำการลบใบแจ้งหนี้นี้อย่างถาวร
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t("title")}</AlertDialogTitle>
+            <AlertDialogDescription>{t("description")}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">ยกเลิก</AlertDialogCancel>
+            <AlertDialogCancel type="button">{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button type="submit" variant="destructive">
-                ยืนยันการลบ
+                {t("confirm")}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

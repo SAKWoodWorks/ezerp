@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Printer, Loader2, ChevronDown } from "lucide-react"
 import { useState } from "react"
+import { useTranslations } from "next-intl"
 
 interface Props {
   invoiceNumber: string
@@ -16,7 +17,7 @@ interface Props {
 
 export default function InvoicePrintDropdown({ invoiceNumber }: Props) {
   const [isGenerating, setIsGenerating] = useState(false)
-
+  const t = useTranslations("PrintButton")
   // ฟังก์ชันสำหรับ "อ่าน" ข้อมูลจากหน้าเว็บแล้วสร้างเป็น HTML สำหรับพิมพ์
   const generateInvoiceHTML = (
     element: HTMLElement,
@@ -227,16 +228,16 @@ export default function InvoicePrintDropdown({ invoiceNumber }: Props) {
           ) : (
             <Printer size={16} className="mr-2" />
           )}
-          พิมพ์ / Export
+          {t("printText")}
           <ChevronDown size={16} className="ml-2" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => handlePrint("Original")}>
-          ต้นฉบับ (สำหรับลูกค้า)
+          {t("originalText")}
         </DropdownMenuItem>
         <DropdownMenuItem onClick={() => handlePrint("Copy")}>
-          สำเนา (สำหรับกิจการ)
+          {t("copyText")}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

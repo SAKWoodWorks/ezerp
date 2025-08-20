@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
+import { getTranslations } from "next-intl/server"
 import Link from "next/link"
 import EditForm from "./EditForm"
 import DeleteButton from "./DeleteButton"
@@ -41,6 +42,7 @@ export default async function ProductDetailPage(props: Props) {
   const params = await props.params
   const { id } = params
   const supabase = await createClient()
+  const t = await getTranslations("ProductDetailPage")
 
   // Fetch product, warehouses, and inventory data in parallel for efficiency
   const [productRes, warehousesRes, inventoriesRes] = await Promise.all([
@@ -93,7 +95,7 @@ export default async function ProductDetailPage(props: Props) {
             className="text-sm text-muted-foreground hover:underline flex items-center mb-2"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            กลับไปหน้ารายการสินค้า
+            {t("backLink")}
           </Link>
           <h1 className="text-3xl font-bold">{typedProduct.name}</h1>
         </div>
@@ -117,11 +119,11 @@ export default async function ProductDetailPage(props: Props) {
         {/* Main product details card */}
         <Card className="md:col-span-2">
           <CardHeader>
-            <CardTitle>รายละเอียดสินค้า/บริการ</CardTitle>
+            <CardTitle>{t("detailsTitle")}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="font-medium text-gray-500">ราคา</p>
+              <p className="font-medium text-gray-500">{t("price")}</p>
               <p className="text-xl font-semibold">
                 ฿
                 {Number(typedProduct.price).toLocaleString("en-US", {
@@ -130,27 +132,27 @@ export default async function ProductDetailPage(props: Props) {
               </p>
             </div>
             <div>
-              <p className="font-medium text-gray-500">คำอธิบาย</p>
+              <p className="font-medium text-gray-500">{t("description")}</p>
               <p>{typedProduct.description || "-"}</p>
             </div>
             <div className="grid grid-cols-3 gap-4 border-t pt-4">
               <div>
-                <p className="font-medium text-gray-500">ความหนา</p>
+                <p className="font-medium text-gray-500">{t("thickness")}</p>
                 <p className="text-lg font-semibold">
-                  {typedProduct.thickness ?? 0} มม.
+                  {typedProduct.thickness ?? 0} {t("mm")}
                 </p>
               </div>
               <div>
-                <p className="font-medium text-gray-500">ความกว้าง</p>
+                <p className="font-medium text-gray-500">{t("width")}</p>
                 <p className="text-lg font-semibold">
-                  {typedProduct.width ?? 0} มม.
+                  {typedProduct.width ?? 0} {t("mm")}
                 </p>
               </div>
 
               <div>
-                <p className="font-medium text-gray-500">ความยาว</p>
+                <p className="font-medium text-gray-500">{t("length")}</p>
                 <p className="text-lg font-semibold">
-                  {typedProduct.length ?? 0} ม.
+                  {typedProduct.length ?? 0} {t("m")}
                 </p>
               </div>
             </div>

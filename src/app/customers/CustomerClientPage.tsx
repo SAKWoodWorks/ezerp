@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea" // Import Textarea
+import ImportCustomerDialog from "./ImportCustomerDialog" // Import component ใหม่
 
 type Customer = {
   id: number
@@ -65,6 +66,8 @@ export default function CustomerClientPage({ initialCustomers }: Props) {
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
+        {/* ปุ่มสำหรับ Import ข้อมูล */}
+        <ImportCustomerDialog />
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>

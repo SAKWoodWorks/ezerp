@@ -1,5 +1,5 @@
 "use client"
-
+import { useTranslations } from "next-intl"
 import { deleteProduct } from "../actions"
 import { Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -17,29 +17,31 @@ import {
 
 export default function DeleteButton({ productId }: { productId: number }) {
   const deleteProductWithId = deleteProduct.bind(null, productId)
-
+  const t = useTranslations("DeleteDialog")
+  const tCommon = useTranslations("Common")
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
         <Button variant="destructive">
           <Trash2 size={16} className="mr-2" />
-          ลบสินค้า
+          {t("deleteProduct")}
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <form action={deleteProductWithId}>
           <AlertDialogHeader>
-            <AlertDialogTitle>คุณแน่ใจหรือไม่?</AlertDialogTitle>
+            <AlertDialogTitle>{tCommon("areYouSure")}</AlertDialogTitle>
             <AlertDialogDescription>
-              การกระทำนี้ไม่สามารถย้อนกลับได้
-              ระบบจะทำการลบข้อมูลสินค้านี้อย่างถาวร
+              {tCommon("actionCannotBeUndone")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">ยกเลิก</AlertDialogCancel>
+            <AlertDialogCancel type="button">
+              {tCommon("cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction asChild>
               <Button type="submit" variant="destructive">
-                ยืนยันการลบ
+                {tCommon("confirmDelete")}
               </Button>
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -3,6 +3,7 @@
 import * as React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useTranslations } from "next-intl"
 import { updateInvoice } from "../../actions" // ใช้ action สำหรับ update
 import { Plus, Trash2, Check, ChevronsUpDown, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -58,6 +59,7 @@ export default function InvoiceForm({
   invoice,
   responsiblePersons,
 }: Props) {
+  const t = useTranslations("InvoiceForm")
   const router = useRouter()
   const [items, setItems] = useState<InvoiceItem[]>(
     invoice.items || [{ description: "", quantity: 1, unitPrice: 0 }]
@@ -119,13 +121,13 @@ export default function InvoiceForm({
       {/* เพิ่ม input ที่ซ่อนไว้ */}
       <Card>
         <CardHeader>
-          <CardTitle>ข้อมูลใบแจ้งหนี้</CardTitle>
+          <CardTitle>{t("invoiceDataTitle")}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           {/* ... ฟอร์มเหมือนหน้า New แต่มี defaultValue ... */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>ลูกค้า</Label>
+              <Label>{t("customerLabel")}</Label>
               <Popover
                 open={openCustomerCombobox}
                 onOpenChange={setOpenCustomerCombobox}
@@ -140,7 +142,7 @@ export default function InvoiceForm({
                       ? customers.find(
                           (c) => String(c.id) === selectedCustomerId
                         )?.name
-                      : "-- เลือกลูกค้า --"}
+                      : t("customerPlaceholder")}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
@@ -148,7 +150,7 @@ export default function InvoiceForm({
                   <Command>
                     <CommandInput placeholder="ค้นหาลูกค้า..." />
                     <CommandList>
-                      <CommandEmpty>ไม่พบลูกค้า</CommandEmpty>
+                      <CommandEmpty>{t("searchCustomerNotfound")}</CommandEmpty>
                       <CommandGroup>
                         {customers.map((c) => (
                           <CommandItem
@@ -178,7 +180,7 @@ export default function InvoiceForm({
             </div>
             {/* --- เพิ่มเมนูเลือกผู้รับผิดชอบที่นี่ --- */}
             <div className="space-y-2">
-              <Label>ผู้รับผิดชอบ</Label>
+              <Label>{t("responsiblePersonLabel")}</Label>
               <Popover
                 open={openResponsiblePersonCombobox}
                 onOpenChange={setOpenResponsiblePersonCombobox}
@@ -193,15 +195,19 @@ export default function InvoiceForm({
                       ? responsiblePersons.find(
                           (p) => String(p.id) === selectedResponsiblePersonId
                         )?.name
-                      : "-- เลือกผู้รับผิดชอบ --"}
+                      : t("responsiblePersonPlaceholder")}
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
-                    <CommandInput placeholder="ค้นหาผู้รับผิดชอบ..." />
+                    <CommandInput
+                      placeholder={"searchResponsiblePersonPlaceholder"}
+                    />
                     <CommandList>
-                      <CommandEmpty>ไม่พบข้อมูล</CommandEmpty>
+                      <CommandEmpty>
+                        {t("searchResponsiblePersonNotfound")}
+                      </CommandEmpty>
                       <CommandGroup>
                         {responsiblePersons.map((p) => (
                           <CommandItem
@@ -230,7 +236,9 @@ export default function InvoiceForm({
               </Popover>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="invoiceNumber">เลขที่ Invoice</Label>
+              <Label htmlFor="invoiceNumber">
+                {t("editFormInvoiceNumber")}
+              </Label>
               <Input
                 id="invoiceNumber"
                 name="invoiceNumber"
@@ -239,7 +247,7 @@ export default function InvoiceForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="issueDate">วันที่ออก</Label>
+              <Label htmlFor="issueDate">{t("issueDateLabel")}</Label>
               <Input
                 id="issueDate"
                 name="issueDate"
@@ -249,7 +257,7 @@ export default function InvoiceForm({
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dueDate">วันครบกำหนด</Label>
+              <Label htmlFor="dueDate">{t("dueDateLabel")}</Label>
               <Input
                 id="dueDate"
                 name="dueDate"
@@ -260,7 +268,7 @@ export default function InvoiceForm({
             </div>
           </div>
           <div className="border-t pt-6">
-            <h3 className="text-lg font-semibold mb-4">รายการสินค้า/บริการ</h3>
+            <h3 className="text-lg font-semibold mb-4">{t("itemsTitle")}</h3>
             <div className="space-y-2">
               {items.map((item, index) => (
                 <div
@@ -269,7 +277,7 @@ export default function InvoiceForm({
                 >
                   <Input
                     type="text"
-                    placeholder="คำอธิบาย"
+                    placeholder={t("addItem")}
                     value={item.description}
                     onChange={(e) =>
                       handleItemChange(index, "description", e.target.value)
@@ -278,7 +286,7 @@ export default function InvoiceForm({
                   />
                   <Input
                     type="number"
-                    placeholder="จำนวน"
+                    placeholder={t("quantityPlaceholder")}
                     value={item.quantity}
                     onChange={(e) =>
                       handleItemChange(index, "quantity", e.target.value)
@@ -287,7 +295,7 @@ export default function InvoiceForm({
                   />
                   <Input
                     type="number"
-                    placeholder="ราคา/หน่วย (รวม VAT)"
+                    placeholder={t("unitPricePlaceholder")}
                     value={item.unitPrice}
                     onChange={(e) =>
                       handleItemChange(index, "unitPrice", e.target.value)
@@ -313,13 +321,13 @@ export default function InvoiceForm({
               className="mt-2"
             >
               <Plus size={16} className="mr-2" />
-              เพิ่มรายการ
+              {t("addItem")}
             </Button>
           </div>
           <div className="flex justify-end mt-4">
             <div className="w-full max-w-xs space-y-2">
               <div className="flex justify-between">
-                <span>ยอดรวมก่อนภาษี</span>
+                <span>{t("totalBeforeVat")}</span>
                 <span>
                   ฿
                   {subTotal.toLocaleString("en-US", {
@@ -328,13 +336,13 @@ export default function InvoiceForm({
                 </span>
               </div>
               <div className="flex justify-between">
-                <span>ภาษีมูลค่าเพิ่ม (7%)</span>
+                <span>{t("totalVat")}</span>
                 <span>
                   ฿{vat.toLocaleString("en-US", { minimumFractionDigits: 2 })}
                 </span>
               </div>
               <div className="flex justify-between font-bold text-lg border-t pt-2">
-                <span>ยอดรวมทั้งสิ้น</span>
+                <span>{t("totalAmount")}</span>
                 <span>
                   ฿
                   {grandTotal.toLocaleString("en-US", {
@@ -347,11 +355,11 @@ export default function InvoiceForm({
         </CardContent>
         <CardFooter className="flex justify-end gap-2">
           <Button type="button" variant="ghost" onClick={() => router.back()}>
-            ยกเลิก
+            {t("cancelButton")}
           </Button>
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            บันทึกการเปลี่ยนแปลง
+            {t("saveEditInvoice")}
           </Button>
         </CardFooter>
       </Card>

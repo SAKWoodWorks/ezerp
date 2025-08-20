@@ -1,5 +1,6 @@
 "use client"
 
+import { useTranslations } from "next-intl"
 import { useState, useTransition } from "react"
 import { adjustStock } from "../actions"
 import { Button } from "@/components/ui/button"
@@ -50,7 +51,7 @@ export default function AdjustStockDialog({
   const [quantity, setQuantity] = useState("")
   const [notes, setNotes] = useState("")
   const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>("")
-
+  const t = useTranslations("AdjustStockDialog")
   const handleFormSubmit = () => {
     if (!selectedWarehouseId) {
       alert("กรุณาเลือกคลังสินค้า")
@@ -89,28 +90,28 @@ export default function AdjustStockDialog({
       <DialogTrigger asChild>
         <Button variant="outline">
           <Warehouse className="mr-2 h-4 w-4" />
-          จัดการสต็อก
+          {t("buttonTitle")}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>จัดการสต็อก</DialogTitle>
+          <DialogTitle>{t("dialogTitle")}</DialogTitle>
           <DialogDescription>
-            รับสินค้าเข้าหรือปรับปรุงจำนวนสินค้าคงคลัง (ปัจจุบัน: {currentStock}{" "}
-            ชิ้น)
+            {t("dialogDescriptionMessage")} (
+            {t("dialogDescription", { currentStock })})
           </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4 py-4">
           <div className="space-y-2">
-            <Label htmlFor="warehouse">คลังสินค้า</Label>
+            <Label htmlFor="warehouse">{t("warehouseLabel")}</Label>
             <Select
               required
               value={selectedWarehouseId}
               onValueChange={setSelectedWarehouseId}
             >
               <SelectTrigger id="warehouse">
-                <SelectValue placeholder="-- เลือกคลังสินค้า --" />
+                <SelectValue placeholder={t("warehousePlaceholder")} />
               </SelectTrigger>
               <SelectContent>
                 {warehouses.map((wh) => (
@@ -122,7 +123,7 @@ export default function AdjustStockDialog({
             </Select>
           </div>
           <div className="space-y-2">
-            <Label>ประเภท</Label>
+            <Label>{t("stockType")}</Label>
             <RadioGroup
               value={type}
               onValueChange={(value: AdjustmentType) => setType(value)}
@@ -130,36 +131,36 @@ export default function AdjustStockDialog({
             >
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="receive" id="r-receive" />
-                <Label htmlFor="r-receive">รับสินค้าเข้า</Label>
+                <Label htmlFor="r-receive">{t("typeReceive")}</Label>
               </div>
               <div className="flex items-center space-x-2">
                 <RadioGroupItem value="adjustment" id="r-adjustment" />
-                <Label htmlFor="r-adjustment">ปรับปรุงสต็อก</Label>
+                <Label htmlFor="r-adjustment">{t("typeAdjust")}</Label>
               </div>
             </RadioGroup>
           </div>
           <div className="space-y-1">
             <Label htmlFor="quantity">
               {type === "receive"
-                ? "จำนวนที่รับเข้า (+)"
-                : "จำนวนที่เปลี่ยนแปลง (+/-)"}
+                ? t("quantityReceiveLabel")
+                : t("quantityAdjustLabel")}
             </Label>
             <Input
               id="quantity"
               name="quantity"
               type="number"
-              placeholder="เช่น 10 หรือ -5"
+              placeholder={t("quantityAdjustPlaceholder")}
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               required
             />
           </div>
           <div className="space-y-1">
-            <Label htmlFor="notes">หมายเหตุ</Label>
+            <Label htmlFor="notes">{t("notesLabel")}</Label>
             <Textarea
               id="notes"
               name="notes"
-              placeholder="เช่น รับจาก Lot#123 หรือ สต็อกเสียหาย"
+              placeholder={t("notesPlaceholder")}
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
             />
@@ -167,11 +168,11 @@ export default function AdjustStockDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setIsOpen(false)}>
-            ยกเลิก
+            {t("cancelButton")}
           </Button>
           <Button onClick={handleFormSubmit} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            บันทึก
+            {t("confirmButton")}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from "react"
 import { addProduct } from "./actions"
 import { Plus, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation" // 1. Import useRouter
-
+import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -48,6 +48,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter() // 2. Initialize router
+  const t = useTranslations("ProductsPage")
 
   useEffect(() => {
     setProducts(initialProducts)
@@ -68,25 +69,23 @@ export default function ProductClientPage({ initialProducts }: Props) {
   return (
     <div className="p-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold">สินค้า</h1>
+        <h1 className="text-3xl font-bold">{t("title")}</h1>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
             <Button>
-              <Plus size={20} className="mr-2" /> เพิ่มสินค้าใหม่
+              <Plus size={20} className="mr-2" /> {t("addNew")}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>เพิ่มสินค้า</DialogTitle>
-              <DialogDescription>
-                กรอกข้อมูลเพื่อเพิ่มรายการลงในระบบ
-              </DialogDescription>
+              <DialogTitle>{t("dialogTitle")}</DialogTitle>
+              <DialogDescription>{t("dialogDescription")}</DialogDescription>
             </DialogHeader>
             <form action={handleFormSubmit}>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="name" className="text-right">
-                    ชื่อ
+                    {t("addNewItemNameLabel")}
                   </Label>
                   <Input
                     id="name"
@@ -97,7 +96,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="description" className="text-right">
-                    คำอธิบาย
+                    {t("addNewItemDescLabel")}
                   </Label>
                   <Textarea
                     id="description"
@@ -108,7 +107,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                 <div className="grid grid-cols-3 gap-4">
                   {/* Corrected Order: Thickness, Width, Length */}
                   <div className="space-y-2">
-                    <Label htmlFor="thickness">ความหนา (มม.)</Label>
+                    <Label htmlFor="thickness">{t("thickness")}</Label>
                     <Input
                       id="thickness"
                       name="thickness"
@@ -119,7 +118,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="width">ความกว้าง (มม.)</Label>
+                    <Label htmlFor="width">{t("width")}</Label>
                     <Input
                       id="width"
                       name="width"
@@ -130,7 +129,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="length">ความยาว (ม.)</Label>
+                    <Label htmlFor="length">{t("length")}</Label>
                     <Input
                       id="length"
                       name="length"
@@ -143,7 +142,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="price" className="text-right">
-                    ราคา
+                    {t("addNewItemPriceLabel")}
                   </Label>
                   <Input
                     id="price"
@@ -158,7 +157,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                 {/* --- เพิ่มช่องกรอกสต็อก --- */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="stock_quantity" className="text-right">
-                    จำนวนในสต็อก
+                    {t("stockQuantity")}
                   </Label>
                   <Input
                     id="stock_quantity"
@@ -172,7 +171,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                 {/* New Field for Low Stock Threshold */}
                 <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="low_stock_threshold" className="text-right">
-                    จุดสั่งซื้อขั้นต่ำ
+                    {t("lowStockThreshold")}
                   </Label>
                   <Input
                     id="low_stock_threshold"
@@ -189,7 +188,7 @@ export default function ProductClientPage({ initialProducts }: Props) {
                   {isPending && (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   )}
-                  บันทึก
+                  {t("addNewItemButtonTitle")}
                 </Button>
               </DialogFooter>
             </form>
@@ -199,18 +198,22 @@ export default function ProductClientPage({ initialProducts }: Props) {
 
       <Card>
         <CardHeader>
-          <CardTitle>รายการสินค้าทั้งหมด</CardTitle>
+          <CardTitle>{t("productListTitle")}</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ชื่อสินค้า/บริการ</TableHead>
-                <TableHead>ขนาด (นxกxย) มม.</TableHead>{" "}
+                <TableHead>{t("tableHeaderName")}</TableHead>
+                <TableHead>{t("tableHeaderDimensions")}</TableHead>{" "}
                 {/* Corrected: Added this header */}
-                <TableHead>คำอธิบาย</TableHead>
-                <TableHead className="text-right">จำนวน</TableHead>
-                <TableHead className="text-right">ราคา</TableHead>
+                <TableHead>{t("tableHeaderDescription")}</TableHead>
+                <TableHead className="text-right">
+                  {t("tableHeaderQuantity")}
+                </TableHead>
+                <TableHead className="text-right">
+                  {t("tableHeaderPrice")}
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

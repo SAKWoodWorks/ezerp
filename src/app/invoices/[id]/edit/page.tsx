@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import InvoiceForm from "./InvoiceForm"
+import { getTranslations } from "next-intl/server"
 
 type Props = {
   params: Promise<{ id: string }>
@@ -10,6 +11,7 @@ export default async function EditInvoicePage({ params }: Props) {
   const supabase = await createClient()
   // แก้ไข: await params ใน Next.js 15+
   const { id } = await params
+  const t = await getTranslations("InvoiceForm")
 
   // // ดึงข้อมูล Invoice และ Customers มาพร้อมกัน
   // const { data: invoice, error: invoiceError } = await supabase
@@ -64,7 +66,7 @@ export default async function EditInvoicePage({ params }: Props) {
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-6">
-        แก้ไขใบแจ้งหนี้ #{invoice.invoice_number}
+        {t("editTitle")} #{invoice.invoice_number}
       </h1>
       <InvoiceForm
         customers={customers || []}

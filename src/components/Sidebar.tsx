@@ -19,6 +19,7 @@ import {
   History,
   ChevronRight,
   Warehouse,
+  Receipt,
   //BookUser,
 } from "lucide-react"
 import { logout } from "./actions"
@@ -41,6 +42,7 @@ export default function Sidebar() {
     { href: "/customers", label: t("customers"), icon: Users },
     { href: "/quotations", label: t("quotations"), icon: ClipboardList },
     { href: "/invoices", label: t("invoices"), icon: FileText },
+    { href: "/cash-bills", label: t("cashBills"), icon: Receipt }, // 2. Add new menu item
     { href: "/products", label: t("products"), icon: Package },
     { href: "/warehouses", label: t("warehouses"), icon: Warehouse },
     {

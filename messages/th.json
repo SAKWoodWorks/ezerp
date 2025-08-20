@@ -4,6 +4,7 @@
     "customers": "ลูกค้า",
     "quotations": "ใบเสนอราคา",
     "invoices": "ใบแจ้งหนี้",
+    "cashBills": "ใบเสร็จรับเงิน",
     "products": "สินค้า",
     "warehouses": "คลังสินค้า",
     "responsible_persons": "ผู้รับผิดชอบ",
@@ -64,7 +65,17 @@
     "tableHeaderName": "ชื่อลูกค้า/บริษัท",
     "tableHeaderPhone": "เบอร์โทร",
     "tableHeaderResponsible": "ผู้รับผิดชอบ",
-    "buttonTitle": "เพิ่มลูกค้า"
+    "buttonTitle": "เพิ่มลูกค้า",
+    "importDialog": {
+      "title": "นําเข้าข้อมูลลูกค้า",
+      "description": "โปรดเลือกไฟล์ CSV ที่ต้องการนําเข้า",
+      "buttonTitle": "นําเข้า",
+      "importSuccess": "นําเข้าข้อมูลลูกค้าเรียบร้อยแล้ว",
+      "records": "รายการ",
+      "instructions": "วิธีการนําเข้า",
+      "selectFile": "เลือกไฟล์",
+      "importButton": "นําเข้า"
+    }
   },
   "CustomerDetailPage": {
     "backLink": "กลับไปหน้ารายชื่อลูกค้า",
@@ -98,42 +109,81 @@
     "buttonCancel": "ยกเลิก"
   },
   "ProductsPage": {
-    "title": "สินค้า/บริการ",
+    "title": "สินค้า",
+    "productListTitle": "รายการสินค้าทั้งหมด",
     "addNew": "เพิ่มสินค้าใหม่",
-    "dialogTitle": "เพิ่มสินค้า/บริการใหม่",
+    "dialogTitle": "เพิ่มสินค้า",
     "dialogDescription": "กรอกข้อมูลเพื่อเพิ่มรายการลงในระบบ",
+    "addNewItemNameLabel": "ชื่อสินค้า",
+    "addNewItemDescLabel": "คำอธิบายสินค้า",
     "thickness": "ความหนา (มม.)",
     "width": "ความกว้าง (มม.)",
     "length": "ความยาว (มม.)",
+    "addNewItemPriceLabel": "ราคา (บาท)",
     "stockQuantity": "จำนวนในสต็อก",
     "lowStockThreshold": "จุดสั่งซื้อขั้นต่ำ",
-    "tableHeaderName": "ชื่อสินค้า/บริการ",
+    "tableHeaderName": "ชื่อสินค้า",
     "tableHeaderDimensions": "ขนาด (สxกxย) มม.",
-    "tableHeaderQuantity": "จำนวน"
+    "tableHeaderPrice": "ราคา",
+    "tableHeaderDescription": "คำอธิบายสินค้า",
+    "tableHeaderQuantity": "จำนวน",
+    "addNewItemButtonTitle": "บันทึก"
   },
   "ProductDetailPage": {
     "backLink": "กลับไปหน้ารายการสินค้า",
-    "detailsTitle": "รายละเอียดสินค้า/บริการ",
+    "detailsTitle": "รายละเอียดสินค้า",
+    "price": "ราคา",
+    "description": "คำอธิบาย",
+    "thickness": "ความหนา",
+    "width": "ความกว้าง",
+    "length": "ความยาว",
     "stockInventoryTitle": "สต็อกคงเหลือ",
     "stockInventoryDescription": "ยอดรวมและยอดแยกตามคลัง",
     "totalStock": "ยอดรวมทั้งหมด",
+    "unitTitle": "ชิ้น",
     "stockByWarehouse": "ยอดตามคลังสินค้า:",
     "noStockInWarehouse": "ไม่มีข้อมูลสต็อกในคลัง",
     "stockMovementHistoryTitle": "ประวัติการเคลื่อนไหวของสต็อก",
     "stockMovementHistoryDescription": "แสดงการเปลี่ยนแปลงสต็อกทั้งหมดของสินค้ารายการนี้",
-    "noStockMovementHistory": "ไม่พบประวัติการเคลื่อนไหวของสต็อก"
+    "noStockMovementHistory": "ไม่พบประวัติการเคลื่อนไหวของสต็อก",
+    "stockMovementHistoryTableHeaderDate": "วันที่",
+    "stockMovementHistoryTableHeaderType": "ประเภท",
+    "stockMovementHistoryTableHeaderQuantity": "จำนวนที่เปลี่ยนแปลง",
+    "stockMovementHistoryTableHeaderDescription": "คําอธิบาย",
+    "mm": "มม.",
+    "m": "ม."
+  },
+  "ProductEditForm": {
+    "editFormTitle": "แก้ไขข้อมูลสินค้า",
+    "editFormButton": "แก้ไขข้อมูลสินค้า",
+    "editFormCancel": "ยกเลิก",
+    "editFormName": "ชื่อสินค้า",
+    "editFormDescription": "คําอธิบายสินค้า",
+    "editFormThickness": "ความหนา (มม.)",
+    "editFormWidth": "ความกว้าง (มม.)",
+    "editFormLength": "ความยาว (มม.)",
+    "editFormPrice": "ราคา (บาท)",
+    "editFormStockQuantity": "จํานวนในสต็อก",
+    "editFormLowStockThreshold": "จุดสั่งซื้อขั้นต่ำ",
+    "editFormSaveButton": "บันทึก"
   },
   "AdjustStockDialog": {
     "buttonTitle": "จัดการสต็อก",
     "dialogTitle": "จัดการสต็อก",
+    "dialogDescriptionMessage": "รับสินค้าเข้าหรือปรับปรุงจำนวนสินค้าคงคลัง",
     "dialogDescription": "ยอดรวมปัจจุบัน: {currentStock} ชิ้น",
     "warehouseLabel": "คลังสินค้า",
     "warehousePlaceholder": "-- เลือกคลังสินค้า --",
+    "stockType": "ประเภท",
     "typeReceive": "รับสินค้าเข้า",
     "typeAdjust": "ปรับปรุงสต็อก",
     "quantityReceiveLabel": "จำนวนที่รับเข้า (+)",
     "quantityAdjustLabel": "จำนวนที่เปลี่ยนแปลง (+/-)",
-    "notesPlaceholder": "เช่น รับจาก Lot#123 หรือ สต็อกเสียหาย"
+    "notesPlaceholder": "เช่น รับจาก Lot#123 หรือ สต็อกเสียหาย",
+    "quantityAdjustPlaceholder": "เช่น +10 หรือ -5",
+    "notesLabel": "หมายเหตุ",
+    "cancelButton": "ยกเลิก",
+    "confirmButton": "ยืนยันการจัดการสต็อก"
   },
   "TransferStockDialog": {
     "buttonTitle": "ย้ายสินค้า",
@@ -144,7 +194,14 @@
     "toWarehouse": "ไปยังคลังสินค้า",
     "toWarehousePlaceholder": "-- เลือกคลังปลายทาง --",
     "quantityToTransfer": "จำนวนที่ย้าย",
-    "notesPlaceholder": "เหตุผลในการย้าย (ถ้ามี)"
+    "notesPlaceholder": "เหตุผลในการย้าย (ถ้ามี)",
+    "cancelButton": "ยกเลิก",
+    "confirmButton": "ยืนยันการย้าย",
+    "alertFillAllFields": "กรุณากรอกข้อมูลให้ครบถ้วน",
+    "alertDifferentWarehouses": "คลังสินค้าต้นทางและปลายทางต้องแตกต่างกัน",
+    "alertQuantityMoreThanZero": "จำนวนต้องมากกว่า 0",
+    "alertMoveStockSuccess": "ย้ายสินค้าสำเร็จ!",
+    "alertMoveStockError": "เกิดข้อผิดพลาดในการย้ายสินค้า!"
   },
   "WarehousesPage": {
     "title": "จัดการคลังสินค้า",
@@ -305,14 +362,80 @@
     "totalAmount": "ยอดรวมทั้งสิ้น",
     "cancelButton": "ยกเลิก",
     "saveInvoice": "บันทึกฉบับร่าง",
+    "saveEditInvoice": "บันทึกการเปลี่ยนแปลง",
     "setInvoiceNumber": "กรุณาเลือกผู้รับผิดชอบและประเภทราคา",
-    "setInvoiceNumberStatus": "กำลังสร้าง..."
+    "setInvoiceNumberStatus": "กำลังสร้าง...",
+    "invoiceDataTitle": "ข้อมูลใบแจ้งหนี้",
+    "editFormInvoiceNumber": "เลขที่ใบแจ้งหนี้"
+  },
+  "CashBillsPage": {
+    "addNew": "เพิ่มใบเสร็จชําระเงิน",
+    "title": "ใบเสร็จชําระเงิน",
+    "tableHeaderTitle": "รายการใบเสร็จชําระเงิน",
+    "tableHeaderNumber": "เลขที่ใบเสร็จ",
+    "tableHeaderCustomer": "ลูกค้า",
+    "tableHeaderIssueDate": "วันที่ออกใบเสร็จ",
+    "tableHeaderTotal": "ยอดรวม",
+    "tableHeaderStatus": "สถานะ"
+  },
+  "CashBillForm": {
+    "createTitle": "สร้างใบเสร็จชําระเงินใหม่",
+    "customerLabel": "ลูกค้า",
+    "customerPlaceholder": "-- เลือกลูกค้า --",
+    "searchCustomerPlaceholder": "ค้นหาลูกค้า...",
+    "searchCustomerNotfound": "ไม่พบลูกค้า",
+    "issueDateLabel": "วันที่ออกใบเสร็จ",
+    "priceTierLabel": "ประเภทราคา",
+    "selectPriceTierPlaceholder": "-- เลือกประเภทราคา --",
+    "searchPriceTierNotfound": "ไม่พบประเภทราคา",
+    "itemsTitle": "รายการสินค้า",
+    "addItem": "เพิ่มรายการ",
+    "productPlaceholder": "-- เลือกสินค้า --",
+    "searchProductPlaceholder": "ค้นหาสินค้า...",
+    "searchProductNotfound": "ไม่พบสินค้า",
+    "insertProductItemsPlaceholder": "หรือพิมพ์คำอธิบายเอง",
+    "responsiblePersonLabel": "ผู้รับผิดชอบ",
+    "responsiblePersonPlaceholder": "-- เลือกผู้รับผิดชอบ --",
+    "quantityPlaceholder": "จำนวน",
+    "unitPricePlaceholder": "ราคาต่อหน่วย (รวม VAT)",
+    "totalBeforeVat": "ยอดรวมก่อนภาษี",
+    "totalVat": "ภาษีมูลค่าเพิ่ม (7%)",
+    "totalAmount": "ยอดรวมทั้งสิ้น",
+    "cancelButton": "ยกเลิก",
+    "saveDraftButton": "บันทึกฉบับร่าง",
+    "saveCashBill": "บันทึกใบเสร็จ",
+    "notFound": "ไม่พบข้อมูล",
+    "warehouseLabel": "คลังสินค้า",
+    "warehousePlaceholder": "-- เลือกคลังสินค้า --"
+  },
+  "CashBillDetailPage": {
+    "backLink": "กลับไปหน้ารายการใบเสร็จชําระเงิน",
+    "title": "รายละเอียดใบเสร็จชําระเงิน",
+    "detailsTitle": "รายละเอียดใบเสร็จชําระเงิน",
+    "walkInCustomer": "ลูกค้าหน้าร้าน",
+    "issueDate": "วันที่ออกใบเสร็จ",
+    "responsiblePerson": "ผู้รับผิดชอบ",
+    "itemsTitle": "รายการสินค้า",
+    "tableHeaderItem": "รายการ",
+    "tableHeaderQuantity": " จํานวน",
+    "tableHeaderUnitPrice": "ราคาต่อหน่วย (รวม VAT)",
+    "tableHeaderAmount": "ยอดรวม",
+    "total": "ยอดรวม",
+    "billTo": "ถึง",
+    "print": "พิมพ์"
   },
   "InvoiceStatus": {
     "accepted": "อนุมัติ",
     "rejected": "ปฏิเสธ",
     "draft": "ฉบับร่าง",
     "sent": "ส่งแล้ว"
+  },
+  "UpdateStatusBUtton": {
+    "errorUpdate": "เกิดข้อผิดพลาด",
+    "paidSuccess": "ชำระเงินเรียบร้อยแล้ว",
+    "saving": "กำลังบันทึก...",
+    "sentSuccess": "ส่งแล้ว",
+    "paid": "ชำระแล้ว"
   },
 
   "WarehouseDetailPage": {
@@ -322,6 +445,11 @@
     "productsInWarehouseDescription": "รายการสินค้าทั้งหมดที่จัดเก็บใน {warehouseName}",
     "tableHeaderRemaining": "จำนวนคงเหลือ",
     "noProductsFound": "ไม่พบสินค้าในคลังนี้"
+  },
+  "PrintButton": {
+    "printText": "พิมพ์ / ส่งออก",
+    "originalText": "ต้นฉบับ (สำหรับลูกค้า)",
+    "copyText": "สำเนา (สำหรับกิจการ)"
   },
   "DeleteDialog": {
     "deleteCustomer": "ลบลูกค้า",

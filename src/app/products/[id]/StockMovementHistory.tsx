@@ -1,5 +1,5 @@
 "use client"
-
+import { useTranslations } from "next-intl"
 import {
   Card,
   CardContent,
@@ -56,22 +56,32 @@ const getQuantityChangeStyle = (quantity: number) => {
 }
 
 export default function StockMovementHistory({ movements }: Props) {
+  //const t = useTranslations("TransferStockDialog")
+  const tProduct = useTranslations("ProductDetailPage")
   return (
     <Card>
       <CardHeader>
-        <CardTitle>ประวัติการเคลื่อนไหวของสต็อก</CardTitle>
+        <CardTitle>{tProduct("stockMovementHistoryTitle")}</CardTitle>
         <CardDescription>
-          แสดงการเปลี่ยนแปลงสต็อกทั้งหมดของสินค้ารายการนี้
+          {tProduct("stockMovementHistoryDescription")}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>วันที่</TableHead>
-              <TableHead>ประเภท</TableHead>
-              <TableHead className="text-right">จำนวนที่เปลี่ยนแปลง</TableHead>
-              <TableHead>หมายเหตุ</TableHead>
+              <TableHead>
+                {tProduct("stockMovementHistoryTableHeaderDate")}
+              </TableHead>
+              <TableHead>
+                {tProduct("stockMovementHistoryTableHeaderType")}
+              </TableHead>
+              <TableHead className="text-right">
+                {tProduct("stockMovementHistoryTableHeaderQuantity")}
+              </TableHead>
+              <TableHead>
+                {tProduct("stockMovementHistoryTableHeaderDescription")}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -88,6 +98,7 @@ export default function StockMovementHistory({ movements }: Props) {
                       {move.type}
                     </Badge>
                   </TableCell>
+
                   <TableCell
                     className={`text-right ${getQuantityChangeStyle(
                       move.quantity_change
@@ -108,7 +119,7 @@ export default function StockMovementHistory({ movements }: Props) {
                   colSpan={4}
                   className="text-center text-muted-foreground"
                 >
-                  ไม่พบประวัติการเคลื่อนไหวของสต็อก
+                  {tProduct("noStockMovementHistory")}
                 </TableCell>
               </TableRow>
             )}

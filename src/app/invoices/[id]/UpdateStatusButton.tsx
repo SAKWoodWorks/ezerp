@@ -2,6 +2,7 @@
 
 import { updateInvoiceStatus } from "../actions"
 import { useTransition } from "react"
+import { useTranslations } from "next-intl"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { CheckCircle, Send, Loader2 } from "lucide-react"
@@ -17,6 +18,7 @@ export default function UpdateStatusButton({
 }: Props) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
+  const t = useTranslations("UpdateStatusBUtton")
 
   const handleUpdateStatus = (newStatus: string) => {
     startTransition(async () => {
@@ -24,7 +26,7 @@ export default function UpdateStatusButton({
       if (result?.message === "Success") {
         router.refresh()
       } else {
-        alert(result?.message || "เกิดข้อผิดพลาด")
+        alert(result?.message || t("errorUpdate"))
       }
     })
   }
@@ -32,7 +34,7 @@ export default function UpdateStatusButton({
   if (currentStatus === "Paid") {
     return (
       <span className="text-green-600 font-bold flex items-center h-10 px-4">
-        <CheckCircle size={20} className="mr-2" /> ชำระเงินเรียบร้อยแล้ว
+        <CheckCircle size={20} className="mr-2" /> {t("paidSuccess")}
       </span>
     )
   }
@@ -46,7 +48,7 @@ export default function UpdateStatusButton({
           ) : (
             <Send size={16} className="mr-2" />
           )}
-          {isPending ? "กำลังบันทึก..." : "ส่งแล้ว"}
+          {isPending ? t("saving") : t("sentSuccess")}
         </Button>
       )}
       {currentStatus !== "Draft" && (
@@ -60,7 +62,7 @@ export default function UpdateStatusButton({
           ) : (
             <CheckCircle size={16} className="mr-2" />
           )}
-          {isPending ? "กำลังบันทึก..." : "ชำระแล้ว"}
+          {isPending ? t("saving") : t("paid")}
         </Button>
       )}
     </div>
