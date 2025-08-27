@@ -130,7 +130,7 @@ export default function NewInvoicePage() {
       }
     }
     generateNumber()
-  }, [selectedResponsiblePersonId, selectedPriceTier, responsiblePersons])
+  }, [selectedResponsiblePersonId, selectedPriceTier, responsiblePersons, t])
 
   // ... โค้ด Logic เดิม ...
   const handleItemChange = (

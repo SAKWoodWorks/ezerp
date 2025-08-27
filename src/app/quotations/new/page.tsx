@@ -137,7 +137,7 @@ export default function NewQuotationPage() {
       }
     }
     generateNumber()
-  }, [selectedResponsiblePersonId, selectedPriceTier, responsiblePersons])
+  }, [selectedResponsiblePersonId, selectedPriceTier, responsiblePersons, t])
 
   const handleItemChange = (
     index: number,
