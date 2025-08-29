@@ -3,7 +3,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-// ... (ฟังก์ชัน addAsset, updateAsset, assignAsset, returnAsset ยังคงเหมือนเดิม)
 // Action to add a new office asset
 export async function addAsset(formData: FormData) {
   const supabase = await createClient()
@@ -21,18 +20,25 @@ export async function addAsset(formData: FormData) {
     return { error: "Could not generate a new asset tag." }
   }
 
-  const assetData = {
-    asset_tag: nextAssetTag,
-    type: formData.get("type") as string,
-    model: formData.get("model") as string,
-    serial_number: formData.get("serial_number") as string,
-    purchase_date: (formData.get("purchase_date") as string) || null,
-    purchase_price: Number(formData.get("purchase_price")), // เพิ่มราคาซื้อ
-    notes: formData.get("notes") as string,
+  const serialNumber = formData.get("serial_number") as string
+  const warehouseId = formData.get("warehouseId") as string
+  const type = formData.get("type") as string
+
+  // *** CORRECTED VALIDATION LOGIC HERE ***
+  // Check for the presence of required fields directly from the form data.
+  if (!type || !warehouseId) {
+    return { error: "Type and Warehouse are required." }
   }
 
-  if (!assetData.type) {
-    return { error: "Type is required." }
+  const assetData = {
+    asset_tag: nextAssetTag,
+    type: type,
+    model: formData.get("model") as string,
+    serial_number: serialNumber || null,
+    purchase_date: (formData.get("purchase_date") as string) || null,
+    purchase_price: Number(formData.get("purchase_price")),
+    notes: formData.get("notes") as string,
+    warehouse_id: Number(warehouseId),
   }
 
   const { error } = await supabase.from("office_assets").insert(assetData)
@@ -54,17 +60,23 @@ export async function updateAsset(assetId: number, formData: FormData) {
   } = await supabase.auth.getUser()
   if (!user) return { error: "Authentication required" }
 
-  const assetData = {
-    type: formData.get("type") as string,
-    model: formData.get("model") as string,
-    serial_number: formData.get("serial_number") as string,
-    purchase_date: (formData.get("purchase_date") as string) || null,
-    purchase_price: Number(formData.get("purchase_price")), // เพิ่มราคาซื้อ
-    notes: formData.get("notes") as string,
+  const serialNumber = formData.get("serial_number") as string
+  const warehouseId = formData.get("warehouseId") as string
+  const type = formData.get("type") as string
+
+  // *** CORRECTED VALIDATION LOGIC HERE ***
+  if (!type || !warehouseId) {
+    return { error: "Type and Warehouse are required." }
   }
 
-  if (!assetData.type) {
-    return { error: "Type is required." }
+  const assetData = {
+    type: type,
+    model: formData.get("model") as string,
+    serial_number: serialNumber || null,
+    purchase_date: (formData.get("purchase_date") as string) || null,
+    purchase_price: Number(formData.get("purchase_price")),
+    notes: formData.get("notes") as string,
+    warehouse_id: Number(warehouseId),
   }
 
   const { error } = await supabase
@@ -82,6 +94,7 @@ export async function updateAsset(assetId: number, formData: FormData) {
   return { success: true }
 }
 
+// ... (assignAsset, returnAsset, updateAssetStatus functions remain the same)
 export async function assignAsset(formData: FormData) {
   const supabase = await createClient()
   const {
@@ -157,7 +170,6 @@ export async function returnAsset(assignmentId: number, assetId: number) {
   return { success: true }
 }
 
-// *** เพิ่มฟังก์ชันนี้เข้าไป ***
 export async function updateAssetStatus(assetId: number, newStatus: string) {
   const supabase = await createClient()
   const {
@@ -165,32 +177,27 @@ export async function updateAssetStatus(assetId: number, newStatus: string) {
   } = await supabase.auth.getUser()
   if (!user) return { error: "Authentication required" }
 
-  // Ensure the new status is one of the allowed values
-  const allowedStatuses = ["In Stock", "Assigned", "In Repair", "Retired"]
+  const allowedStatuses = ["In Stock", "In Repair", "Retired"]
   if (!allowedStatuses.includes(newStatus)) {
     return { error: "Invalid status provided." }
   }
 
-  // If setting status to 'In Repair' or 'Retired', ensure it's not currently assigned
-  if (newStatus === "In Repair" || newStatus === "Retired") {
-    const { data: activeAssignment, error: checkError } = await supabase
-      .from("asset_assignments")
-      .select("id")
-      .eq("asset_id", assetId)
-      .is("return_date", null)
-      .single()
+  const { data: activeAssignment, error: checkError } = await supabase
+    .from("asset_assignments")
+    .select("id")
+    .eq("asset_id", assetId)
+    .is("return_date", null)
+    .single()
 
-    if (checkError && checkError.code !== "PGRST116") {
-      // PGRST116 = no rows found, which is good
-      console.error("Error checking assignment:", checkError)
-      return { error: "Could not verify asset assignment status." }
-    }
+  if (checkError && checkError.code !== "PGRST116") {
+    console.error("Error checking assignment:", checkError)
+    return { error: "Could not verify asset assignment status." }
+  }
 
-    if (activeAssignment) {
-      return {
-        error:
-          "Cannot change status. Asset is currently assigned to an employee.",
-      }
+  if (activeAssignment) {
+    return {
+      error:
+        "Cannot change status. Asset is currently assigned to an employee.",
     }
   }
 

@@ -18,6 +18,7 @@ export async function addEmployee(formData: FormData) {
     full_name: formData.get("fullName") as string,
     position: formData.get("position") as string,
     start_date: formData.get("startDate") as string,
+     warehouse_id: Number(formData.get("warehouseId")) || null,
   }
 
   // 1. Insert the new employee and get their ID back.
@@ -69,6 +70,7 @@ export async function updateEmployee(employeeId: number, formData: FormData) {
     full_name: formData.get("fullName") as string,
     position: formData.get("position") as string,
     start_date: formData.get("startDate") as string,
+    warehouse_id: Number(formData.get("warehouseId")) || null,
   }
 
   const { error } = await supabase

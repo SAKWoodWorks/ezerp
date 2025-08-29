@@ -7,6 +7,7 @@
     "cashBills": "ใบเสร็จรับเงิน",
     "products": "สินค้า",
     "warehouses": "คลังสินค้า",
+    "warehouseSummary": "สรุปคลังสินค้า",
     "officeAssets": "ทรัพย์สินสำนักงาน",
     "responsible_persons": "ผู้รับผิดชอบ",
     "employees": "พนักงาน",
@@ -237,6 +238,40 @@
     "tableHeaderName": "ชื่อคลังสินค้า",
     "tableHeaderAddress": "ที่อยู่"
   },
+  "WarehouseDetailPage": {
+    "backLink": "กลับไปหน้ารายการคลังสินค้า",
+    "noAddress": "ไม่มีข้อมูลที่อยู่",
+    "productsInWarehouseTitle": "สินค้าในคลังนี้",
+    "productsInWarehouseDescription": "รายการสินค้าทั้งหมดที่จัดเก็บใน {warehouseName}",
+    "tableHeaderRemaining": "จำนวนคงเหลือ",
+    "noProductsFound": "ไม่พบสินค้าในคลังนี้",
+    "inventoryValue": "มูลค่าสินค้าคงเหลือ",
+    "productItems": "รายการสินค้า",
+    "monthlySales": "ยอดขายเดือนปัจจุบัน",
+    "topSellingTitle": "สินค้าขายดี",
+    "tableProduct": "สินค้า",
+    "tableSoldQty": "จํานวนขาย",
+    "noData": "ไม่มีข้อมูล",
+    "lowStockTitle": "สินค้าใกล้หมด",
+    "tableRemainingQty": "คงเหลือ",
+    "assetSummaryTitle": "สรุปทรัพย์สิน",
+    "assignedEmployeesTitle": "พนักงานที่รับผิดชอบ",
+    "salesInRange": "ยอดขายในช่วงวันที่"
+  },
+  "WarehouseSummaryPage": {
+    "title": "สรุปคลังสินค้า",
+    "tableHeaderWarehouse": "คลังสินค้า",
+    "productItems": "รายการสินค้า",
+    "inventoryValue": "มูลค่าสินค้าคงเหลือ",
+    "currentMonthSales": "ยอดขายเดือนปัจจุบัน",
+    "topSellingTitle": "สินค้าขายดี",
+    "tableProduct": "สินค้า",
+    "tableSoldQty": "จํานวนขาย",
+    "noData": "ไม่มีข้อมูล",
+    "lowStockTitle": "สินค้าใกล้หมด",
+    "tableRemainingQty": "คงเหลือ",
+    "assetSummaryTitle": "สรุปทรัพย์สิน"
+  },
   "QuotationsPage": {
     "title": "ใบเสนอราคา",
     "addNew": "สร้างใบเสนอราคาใหม่",
@@ -462,14 +497,6 @@
     "paid": "ชำระแล้ว"
   },
 
-  "WarehouseDetailPage": {
-    "backLink": "กลับไปหน้ารายการคลังสินค้า",
-    "noAddress": "ไม่มีข้อมูลที่อยู่",
-    "productsInWarehouseTitle": "สินค้าในคลังนี้",
-    "productsInWarehouseDescription": "รายการสินค้าทั้งหมดที่จัดเก็บใน {warehouseName}",
-    "tableHeaderRemaining": "จำนวนคงเหลือ",
-    "noProductsFound": "ไม่พบสินค้าในคลังนี้"
-  },
   "AssetClientPage": {
     "title": "ทรัพย์สินสำนักงาน",
     "addNew": "เพิ่มทรัพย์สินใหม่",

@@ -10,7 +10,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ArrowLeft, Calendar, Tag, Hash, User, DollarSign } from "lucide-react"
+import {
+  ArrowLeft,
+  Calendar,
+  Tag,
+  Hash,
+  User,
+  DollarSign,
+  Warehouse,
+} from "lucide-react"
 import { useTranslations } from "next-intl"
 import ReturnAssetButton from "./ReturnAssetButton"
 import EditAssetForm from "./EditAssetForm"
@@ -22,6 +30,7 @@ type Employee = {
   id: number
   full_name: string
 }
+type Warehouse = { id: number; name: string } // Add Warehouse type
 type Assignment = {
   id: number
   assignment_date: string
@@ -39,10 +48,12 @@ type Asset = {
   status: string
   notes: string | null
   asset_assignments: Assignment[]
+  warehouse_id: number | null
 }
 
 interface Props {
   asset: Asset
+  warehouses: Warehouse[] // Receive warehouses
 }
 
 const formatDate = (dateString: string | null) => {
@@ -69,12 +80,12 @@ const getStatusVariant = (status: string) => {
   }
 }
 
-export default function AssetDetailPageClient({ asset }: Props) {
+export default function AssetDetailPageClient({ asset, warehouses }: Props) {
   const t = useTranslations("AssetDetailPageClient")
   const currentAssignment = asset.asset_assignments.find(
     (a) => a.return_date === null
   )
-
+  const assetWarehouse = warehouses.find((w) => w.id === asset.warehouse_id)
   return (
     <div className="p-8 space-y-6">
       <div className="flex justify-between items-center">
@@ -116,6 +127,14 @@ export default function AssetDetailPageClient({ asset }: Props) {
               <Hash className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
               <strong>{t("serialNumber")}:</strong>
               <span className="ml-2">{asset.serial_number || "-"}</span>
+            </div>
+            {/* --- 2. เพิ่มส่วนแสดงผลคลังสินค้า --- */}
+            <div className="flex items-center">
+              <Warehouse className="w-4 h-4 mr-2 text-muted-foreground" />
+              <strong>คลังสินค้า:</strong>
+              <span className="ml-2">
+                {assetWarehouse ? assetWarehouse.name : "-"}
+              </span>
             </div>
             <div className="flex items-center">
               <Calendar className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
@@ -162,7 +181,7 @@ export default function AssetDetailPageClient({ asset }: Props) {
         </Card>
       </div>
 
-      <EditAssetForm asset={asset} />
+      <EditAssetForm asset={asset} warehouses={warehouses} />
 
       <Card>
         <CardHeader>

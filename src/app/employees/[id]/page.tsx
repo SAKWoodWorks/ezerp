@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import EditForm from "./EditForm"
-import RecordLeaveButton from "./RecordLeaveButton" // Import ปุ่มบันทึกการลา
+import RecordLeaveButton from "./RecordLeaveButton"
 import DeleteButton from "./DeleteButton"
 import {
   Card,
@@ -11,7 +11,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Warehouse } from "lucide-react"
 import {
   Table,
   TableBody,
@@ -27,13 +27,46 @@ type Employee = {
   full_name: string
   position: string | null
   start_date: string | null
+  warehouse_id: number | null
+  warehouses: {
+    // Added for warehouse name
+    id: number
+    name: string
+  } | null
+}
+
+// type WarehouseInfo = {
+//   id: number
+//   name: string
+// }
+
+type AssignedAsset = {
+  assignment_date: string
+  office_assets:
+    | {
+        id: number
+        asset_tag: string
+        type: string
+        model: string | null
+      }[]
+    | null
+}
+
+// Alternative approach: Create a separate type for the flattened data
+type FlattenedAssignedAsset = {
+  assignment_date: string
+  office_asset: {
+    id: number
+    asset_tag: string
+    type: string
+    model: string | null
+  } | null
 }
 
 type SupabaseLeaveBalance = {
   id: number
   remaining_days: number
   leave_type_id?: number
-  // Supabase might return this as either an object or array depending on the relationship
   leave_types:
     | {
         id: number
@@ -52,7 +85,6 @@ type LeaveBalance = {
   id: number
   remaining_days: number
   leave_type_id?: number
-  // Our normalized version - always a single object
   leave_types: {
     id: number
     name: string
@@ -60,7 +92,6 @@ type LeaveBalance = {
   } | null
 }
 
-// Type for transformed leave balance (to match RecordLeaveButton expectation)
 type TransformedLeaveBalance = {
   id: number
   remaining_days: number
@@ -71,7 +102,6 @@ type TransformedLeaveBalance = {
   } | null
 }
 
-// --- Define Props interface for better type safety ---
 interface PageProps {
   params: Promise<{ id: string }>
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>
@@ -81,33 +111,55 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = await createClient()
 
-  // ดึงข้อมูลพนักงานและยอดวันลาคงเหลือพร้อมกัน
-  const [employeeRes, leaveBalancesRes] = await Promise.all([
-    supabase.from("employees").select("*").eq("id", id).single(),
-    supabase
-      .from("leave_balances")
-      .select(
-        "id, remaining_days, leave_type_id, leave_types(id, name, default_days_per_year)"
-      )
-      .eq("employee_id", id),
-  ])
+  // Fetch all necessary data in parallel
+  const [employeeRes, leaveBalancesRes, warehousesRes, assignedAssetsRes] =
+    await Promise.all([
+      supabase
+        .from("employees")
+        .select("*, warehouses(id, name)")
+        .eq("id", id)
+        .single(),
+      supabase
+        .from("leave_balances")
+        .select(
+          "id, remaining_days, leave_type_id, leave_types(id, name, default_days_per_year)"
+        )
+        .eq("employee_id", id),
+      supabase.from("warehouses").select("id, name").order("name"),
+      supabase
+        .from("asset_assignments")
+        .select("assignment_date, office_assets(id, asset_tag, type, model)")
+        .eq("employee_id", id)
+        .is("return_date", null),
+    ])
 
   const { data: employee, error: employeeError } = employeeRes
   const { data: leaveBalancesData, error: leaveBalancesError } =
     leaveBalancesRes
+  const { data: warehouses, error: warehousesError } = warehousesRes
+  const { data: assignedAssets, error: assetsError } = assignedAssetsRes
 
   if (employeeError || !employee) {
     notFound()
   }
-  if (leaveBalancesError || !leaveBalancesData) {
-    console.error("Leave balances error:", leaveBalancesError)
+  if (
+    leaveBalancesError ||
+    !leaveBalancesData ||
+    warehousesError ||
+    assetsError
+  ) {
+    console.error("Data fetching error:", {
+      leaveBalancesError,
+      warehousesError,
+      assetsError,
+    })
     notFound()
   }
 
-  // Cast ข้อมูล leaveBalances ให้มี Type ที่ถูกต้อง และ normalize ข้อมูล
   const rawLeaveBalances = (leaveBalancesData || []) as SupabaseLeaveBalance[]
+  // Add this type annotation after your data fetching
+  const typedAssignedAssets = (assignedAssets || []) as AssignedAsset[]
 
-  // Normalize the data - handle both array and object cases
   const leaveBalances: LeaveBalance[] = rawLeaveBalances.map((balance) => ({
     id: balance.id,
     remaining_days: balance.remaining_days,
@@ -119,10 +171,6 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
       : balance.leave_types,
   }))
 
-  // Debug: Log the data to see what we're getting
-  console.log("Leave balances data:", JSON.stringify(leaveBalances, null, 2))
-
-  // Transform leaveBalances to match RecordLeaveButton's expected type
   const transformedLeaveBalances: TransformedLeaveBalance[] = leaveBalances.map(
     (balance) => ({
       id: balance.id,
@@ -139,6 +187,15 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
       day: "numeric",
     })
   }
+
+  // Then update your flattening logic to use the typed data
+  const flattenedAssignedAssets: FlattenedAssignedAsset[] =
+    typedAssignedAssets.flatMap((item) =>
+      (item.office_assets || []).map((asset) => ({
+        assignment_date: item.assignment_date,
+        office_asset: asset,
+      }))
+    )
 
   return (
     <div className="p-8 space-y-6">
@@ -177,6 +234,13 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
                 {formatDate(employee.start_date)}
               </p>
             </div>
+            <div>
+              <p className="font-medium text-gray-500">คลังสินค้า</p>
+              <p className="text-lg font-semibold flex items-center">
+                <Warehouse className="w-4 h-4 mr-2 text-muted-foreground" />
+                {employee.warehouses?.name || "ไม่ได้ระบุ"}
+              </p>
+            </div>
           </CardContent>
         </Card>
 
@@ -186,12 +250,6 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
             <CardDescription>สรุปจำนวนวันลาในปีนี้</CardDescription>
           </CardHeader>
           <CardContent>
-            {/* Debug section - remove this after fixing */}
-            <div className="mb-4 p-2 bg-gray-100 rounded text-xs">
-              <strong>Debug:</strong> Found {leaveBalances.length} leave balance
-              records
-            </div>
-
             <Table>
               <TableHeader>
                 <TableRow>
@@ -203,16 +261,7 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
               <TableBody>
                 {leaveBalances.length > 0 ? (
                   leaveBalances.map((balance) => {
-                    // Since Supabase returns the joined 'leave_types' as a single object
                     const leaveType = balance.leave_types
-
-                    // Debug info for each row
-                    console.log(`Balance ${balance.id}:`, {
-                      leave_types: balance.leave_types,
-                      leaveType,
-                      leave_type_id: balance.leave_type_id,
-                    })
-
                     return (
                       <TableRow key={balance.id}>
                         <TableCell className="font-medium">
@@ -246,7 +295,62 @@ export default async function EmployeeDetailPage({ params }: PageProps) {
         </Card>
       </div>
 
-      <EditForm employee={employee as Employee} />
+      {/* New Card for Assigned Assets */}
+      <Card>
+        <CardHeader>
+          <CardTitle>ทรัพย์สินที่รับผิดชอบ</CardTitle>
+          <CardDescription>
+            รายการอุปกรณ์สำนักงานที่กำลังเบิกใช้งาน
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>เลขทะเบียน</TableHead>
+                <TableHead>ประเภท</TableHead>
+                <TableHead>รุ่น/ยี่ห้อ</TableHead>
+                <TableHead>วันที่เบิก</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {flattenedAssignedAssets.length > 0 ? (
+                flattenedAssignedAssets.map(
+                  (item, index) =>
+                    item.office_asset && (
+                      <TableRow key={`${item.office_asset.id}-${index}`}>
+                        <TableCell>
+                          <Link
+                            href={`/assets/${item.office_asset.id}`}
+                            className="font-medium text-blue-600 hover:underline"
+                          >
+                            {item.office_asset.asset_tag}
+                          </Link>
+                        </TableCell>
+                        <TableCell>{item.office_asset.type}</TableCell>
+                        <TableCell>{item.office_asset.model || "-"}</TableCell>
+                        <TableCell>
+                          {formatDate(item.assignment_date)}
+                        </TableCell>
+                      </TableRow>
+                    )
+                )
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="text-center text-muted-foreground"
+                  >
+                    ไม่มีทรัพย์สินที่กำลังเบิกใช้งาน
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
+
+      <EditForm employee={employee as Employee} warehouses={warehouses || []} />
     </div>
   )
 }

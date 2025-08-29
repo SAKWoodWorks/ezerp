@@ -21,6 +21,7 @@ import {
   Warehouse,
   Receipt,
   Laptop,
+  PieChart,
   //BookUser,
 } from "lucide-react"
 import { logout } from "./actions"
@@ -121,6 +122,11 @@ export default function Sidebar() {
       items: [
         { href: "/products", label: t("products"), icon: Package },
         { href: "/warehouses", label: t("warehouses"), icon: Warehouse },
+        {
+          href: "/warehouses/summary",
+          label: t("warehouseSummary"),
+          icon: PieChart,
+        },
       ],
     },
     {

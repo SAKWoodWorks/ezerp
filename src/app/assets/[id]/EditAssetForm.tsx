@@ -14,9 +14,24 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Pencil, Loader2 } from "lucide-react"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { Pencil, Loader2, ChevronsUpDown, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 // Use the same Asset type from the detail page
+type Warehouse = { id: number; name: string }
 type Asset = {
   id: number
   asset_tag: string
@@ -26,25 +41,37 @@ type Asset = {
   purchase_date: string | null
   status: string
   notes: string | null
-  purchase_price: number | null // เพิ่ม property ใหม่
+  purchase_price: number | null
+  warehouse_id: number | null
 }
 
 interface Props {
   asset: Asset
+  warehouses: Warehouse[]
 }
 
-export default function EditAssetForm({ asset }: Props) {
+export default function EditAssetForm({ asset, warehouses }: Props) {
   const t = useTranslations("EditAssetForm")
   const tCommon = useTranslations("Common")
+
+  // State for warehouse selection, initialized with the asset's current warehouse
+  const [warehouseId, setWarehouseId] = useState<string>(
+    String(asset.warehouse_id || "")
+  )
+  const [warehousePopoverOpen, setWarehousePopoverOpen] = useState(false)
+
   const [isEditing, setIsEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
   const updateAssetWithId = updateAsset.bind(null, asset.id)
 
   const handleSubmit = (formData: FormData) => {
+    // Manually append the selected warehouse ID
+    formData.append("warehouseId", warehouseId)
+
     startTransition(async () => {
       const result = await updateAssetWithId(formData)
       if (result.success) {
-        setIsEditing(false) // Close the form on success
+        setIsEditing(false)
       } else {
         alert(`Error: ${result.error}`)
       }
@@ -88,6 +115,56 @@ export default function EditAssetForm({ asset }: Props) {
               name="serial_number"
               defaultValue={asset.serial_number ?? ""}
             />
+          </div>
+          <div className="space-y-2">
+            <Label>คลังสินค้า</Label>
+            <Popover
+              open={warehousePopoverOpen}
+              onOpenChange={setWarehousePopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  className="w-full justify-between"
+                >
+                  {warehouseId
+                    ? warehouses.find((w) => String(w.id) === warehouseId)?.name
+                    : "-- เลือกคลังสินค้า --"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                  <CommandInput placeholder="ค้นหาคลังสินค้า..." />
+                  <CommandList>
+                    <CommandEmpty>ไม่พบคลังสินค้า</CommandEmpty>
+                    <CommandGroup>
+                      {warehouses.map((w) => (
+                        <CommandItem
+                          key={w.id}
+                          value={w.name}
+                          onSelect={() => {
+                            setWarehouseId(String(w.id))
+                            setWarehousePopoverOpen(false)
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              warehouseId === String(w.id)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {w.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-2">
             <Label htmlFor="purchase_date">{t("editFormPurchaseDate")}</Label>

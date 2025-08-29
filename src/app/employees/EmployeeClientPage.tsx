@@ -3,7 +3,7 @@
 import { useState, useEffect, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { addEmployee } from "./actions"
-import { Plus, Loader2 } from "lucide-react"
+import { Plus, Loader2, Check, ChevronsUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -16,7 +16,6 @@ import {
 import {
   Dialog,
   DialogContent,
-  //DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,32 +24,65 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { cn } from "@/lib/utils"
 
+// Updated Employee type to include warehouse information
 type Employee = {
   id: number
   full_name: string
   position: string | null
   start_date: string | null
+  warehouses: { name: string } | null // Can be an object or null
 }
 
+type Warehouse = {
+  id: number
+  name: string
+}
+
+// --- FIX: Make 'warehouses' a required prop ---
 interface Props {
   initialEmployees: Employee[]
+  warehouses?: Warehouse[]
 }
 
-export default function EmployeeClientPage({ initialEmployees }: Props) {
+export default function EmployeeClientPage({
+  initialEmployees,
+  warehouses,
+}: Props) {
   const [employees, setEmployees] = useState(initialEmployees)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
+
+  // State for the warehouse popover
+  const [warehousePopoverOpen, setWarehousePopoverOpen] = useState(false)
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>("")
 
   useEffect(() => {
     setEmployees(initialEmployees)
   }, [initialEmployees])
 
   const handleFormSubmit = (formData: FormData) => {
+    // Manually set warehouseId from state to FormData
+    formData.set("warehouseId", selectedWarehouseId)
     startTransition(async () => {
       await addEmployee(formData)
       setIsDialogOpen(false)
+      setSelectedWarehouseId("") // Reset selection after submit
     })
   }
 
@@ -91,6 +123,63 @@ export default function EmployeeClientPage({ initialEmployees }: Props) {
                   <Label htmlFor="position">ตำแหน่ง</Label>
                   <Input id="position" name="position" />
                 </div>
+
+                {/* Warehouse Selection Popover */}
+                <div className="space-y-2">
+                  <Label>คลังสินค้า</Label>
+                  <Popover
+                    open={warehousePopoverOpen}
+                    onOpenChange={setWarehousePopoverOpen}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        role="combobox"
+                        aria-expanded={warehousePopoverOpen}
+                        className="w-full justify-between"
+                      >
+                        {selectedWarehouseId
+                          ? warehouses?.find(
+                              (wh) => String(wh.id) === selectedWarehouseId
+                            )?.name
+                          : "-- เลือกคลังสินค้า --"}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                      <Command>
+                        <CommandInput placeholder="ค้นหาคลังสินค้า..." />
+                        <CommandList>
+                          <CommandEmpty>ไม่พบคลังสินค้า</CommandEmpty>
+                          <CommandGroup>
+                            {warehouses &&
+                              warehouses.map((wh) => (
+                                <CommandItem
+                                  key={wh.id}
+                                  value={wh.name}
+                                  onSelect={() => {
+                                    setSelectedWarehouseId(String(wh.id))
+                                    setWarehousePopoverOpen(false)
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      selectedWarehouseId === String(wh.id)
+                                        ? "opacity-100"
+                                        : "opacity-0"
+                                    )}
+                                  />
+                                  {wh.name}
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                        </CommandList>
+                      </Command>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
                 <div className="space-y-2">
                   <Label htmlFor="startDate">วันเริ่มงาน</Label>
                   <Input id="startDate" name="startDate" type="date" />
@@ -119,6 +208,7 @@ export default function EmployeeClientPage({ initialEmployees }: Props) {
               <TableRow>
                 <TableHead>ชื่อ-นามสกุล</TableHead>
                 <TableHead>ตำแหน่ง</TableHead>
+                <TableHead>คลังสินค้า</TableHead> {/* New Column */}
                 <TableHead>วันเริ่มงาน</TableHead>
               </TableRow>
             </TableHeader>
@@ -134,6 +224,10 @@ export default function EmployeeClientPage({ initialEmployees }: Props) {
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {employee.position}
+                  </TableCell>
+                  {/* Display Warehouse Name */}
+                  <TableCell className="text-muted-foreground">
+                    {employee.warehouses?.name || "-"}
                   </TableCell>
                   <TableCell className="text-muted-foreground">
                     {formatDate(employee.start_date)}

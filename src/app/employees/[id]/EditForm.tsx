@@ -12,7 +12,21 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Pencil, Loader2 } from "lucide-react"
+import { Pencil, Loader2, Check, ChevronsUpDown } from "lucide-react"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command"
+import { cn } from "@/lib/utils"
 
 // Type Definitions
 type Employee = {
@@ -20,18 +34,31 @@ type Employee = {
   full_name: string
   position: string | null
   start_date: string | null
+  warehouse_id: number | null
+}
+
+type Warehouse = {
+  id: number
+  name: string
 }
 
 interface Props {
   employee: Employee
+  warehouses: Warehouse[]
 }
 
-
-export default function EditForm({ employee }: Props) {
+export default function EditForm({ employee, warehouses }: Props) {
   const [isEditing, setIsEditing] = useState(false)
   const [isPending, startTransition] = useTransition()
 
+  // State for the warehouse popover
+  const [warehousePopoverOpen, setWarehousePopoverOpen] = useState(false)
+  const [selectedWarehouseId, setSelectedWarehouseId] = useState<string>(
+    String(employee.warehouse_id || "")
+  )
+
   const handleFormSubmit = (formData: FormData) => {
+    formData.set("warehouseId", selectedWarehouseId) // Add selected warehouse to form data
     startTransition(async () => {
       const result = await updateEmployee(employee.id, formData)
       if (result?.success) {
@@ -77,6 +104,60 @@ export default function EditForm({ employee }: Props) {
               name="position"
               defaultValue={employee.position ?? ""}
             />
+          </div>
+          {/* Warehouse Selection Popover */}
+          <div className="space-y-2">
+            <Label>คลังสินค้า</Label>
+            <Popover
+              open={warehousePopoverOpen}
+              onOpenChange={setWarehousePopoverOpen}
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={warehousePopoverOpen}
+                  className="w-full justify-between"
+                >
+                  {selectedWarehouseId
+                    ? warehouses.find(
+                        (wh) => String(wh.id) === selectedWarehouseId
+                      )?.name
+                    : "-- เลือกคลังสินค้า --"}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                <Command>
+                  <CommandInput placeholder="ค้นหาคลังสินค้า..." />
+                  <CommandList>
+                    <CommandEmpty>ไม่พบคลังสินค้า</CommandEmpty>
+                    <CommandGroup>
+                      {warehouses.map((wh) => (
+                        <CommandItem
+                          key={wh.id}
+                          value={wh.name}
+                          onSelect={() => {
+                            setSelectedWarehouseId(String(wh.id))
+                            setWarehousePopoverOpen(false)
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedWarehouseId === String(wh.id)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                          {wh.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
           <div className="space-y-1">
             <Label htmlFor="startDate">วันเริ่มงาน</Label>
