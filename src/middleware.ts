@@ -43,7 +43,10 @@ export async function middleware(request: NextRequest) {
   const url = request.nextUrl.clone()
   const isLoginPage = url.pathname === "/login"
 
-  if (!user && !isLoginPage) {
+  // ตรวจสอบว่าเป็นหน้ารายละเอียดอุปกรณ์หรือไม่ (เช่น /assets/123)
+  const isPublicAssetPage = /^\/assets\/\d+$/.test(url.pathname)
+
+  if (!user && !isLoginPage && !isPublicAssetPage) {
     // Redirect to login page if not authenticated
     return NextResponse.redirect(new URL("/login", request.url))
   }

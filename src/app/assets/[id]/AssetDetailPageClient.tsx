@@ -24,6 +24,7 @@ import ReturnAssetButton from "./ReturnAssetButton"
 import EditAssetForm from "./EditAssetForm"
 import UpdateStatusButton from "./UpdateStatusButton"
 import { Badge } from "@/components/ui/badge"
+import type { User as SupabaseUser } from "@supabase/supabase-js"
 
 // Type Definitions
 type Employee = {
@@ -51,9 +52,10 @@ type Asset = {
   warehouse_id: number | null
 }
 
-interface Props {
+interface ClientProps {
   asset: Asset
   warehouses: Warehouse[] // Receive warehouses
+  user: SupabaseUser | null
 }
 
 const formatDate = (dateString: string | null) => {
@@ -80,7 +82,11 @@ const getStatusVariant = (status: string) => {
   }
 }
 
-export default function AssetDetailPageClient({ asset, warehouses }: Props) {
+export default function AssetDetailPageClient({
+  asset,
+  warehouses,
+  user,
+}: ClientProps) {
   const t = useTranslations("AssetDetailPageClient")
   const currentAssignment = asset.asset_assignments.find(
     (a) => a.return_date === null
@@ -181,7 +187,8 @@ export default function AssetDetailPageClient({ asset, warehouses }: Props) {
         </Card>
       </div>
 
-      <EditAssetForm asset={asset} warehouses={warehouses} />
+      {/* ส่ง warehouses ไปให้ EditForm */}
+      {user && <EditAssetForm asset={asset} warehouses={warehouses} />}
 
       <Card>
         <CardHeader>
