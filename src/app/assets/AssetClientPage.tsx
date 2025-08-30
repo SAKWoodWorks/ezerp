@@ -50,6 +50,8 @@ import { Plus, Loader2, UserPlus, ChevronsUpDown, Check } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { cn } from "@/lib/utils"
 
+import AssetQRCodeDialog from "./AssetQRCodeDialog"
+
 // *** CORRECTED TYPE DEFINITIONS ***
 type Employee = { id: number; full_name: string }
 type Warehouse = { id: number; name: string }
@@ -340,77 +342,77 @@ Props) {
                         {assignedEmployee ? assignedEmployee.full_name : "-"}
                       </TableCell>
                       <TableCell className="text-right">
-                        {asset.status === "In Stock" && (
-                          <Dialog
-                            open={isAssignDialogOpen === asset.id}
-                            onOpenChange={(isOpen) =>
-                              setIsAssignDialogOpen(isOpen ? asset.id : null)
-                            }
-                          >
-                            <DialogTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <UserPlus className="mr-2 h-4 w-4" />
-                                {t("AssigntoButton")}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle>{t("AssigntoTitle")}</DialogTitle>
-                                <DialogDescription>
-                                  {t("AssigntoDescription")} {asset.asset_tag} (
-                                  {asset.type})
-                                </DialogDescription>
-                              </DialogHeader>
-                              <form action={handleAssignSubmit}>
-                                <input
-                                  type="hidden"
-                                  name="assetId"
-                                  value={asset.id}
-                                />
-                                <div className="py-4">
-                                  <Label htmlFor="employeeId">
-                                    {t("employee")}:
-                                  </Label>
-                                  <Select name="employeeId" required>
-                                    <SelectTrigger>
-                                      <SelectValue
-                                        placeholder={t("employeePlaceholder")}
-                                      />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      {employees && employees.length > 0 ? (
-                                        employees.map((emp) => (
+                        <div className="flex items-center justify-end gap-2">
+                          <AssetQRCodeDialog asset={asset} />
+                          {asset.status === "In Stock" && (
+                            <Dialog
+                              open={isAssignDialogOpen === asset.id}
+                              onOpenChange={(isOpen) =>
+                                setIsAssignDialogOpen(isOpen ? asset.id : null)
+                              }
+                            >
+                              <DialogTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={(e) => e.stopPropagation()}
+                                >
+                                  <UserPlus className="mr-2 h-4 w-4" />
+                                  {t("AssigntoButton")}
+                                </Button>
+                              </DialogTrigger>
+                              <DialogContent>
+                                <DialogHeader>
+                                  <DialogTitle>
+                                    {t("AssigntoTitle")}
+                                  </DialogTitle>
+                                  <DialogDescription>
+                                    {t("AssigntoDescription")} {asset.asset_tag}{" "}
+                                    ({asset.type})
+                                  </DialogDescription>
+                                </DialogHeader>
+                                <form action={handleAssignSubmit}>
+                                  <input
+                                    type="hidden"
+                                    name="assetId"
+                                    value={asset.id}
+                                  />
+                                  <div className="py-4">
+                                    <Label htmlFor="employeeId">
+                                      {t("employee")}:
+                                    </Label>
+                                    <Select name="employeeId" required>
+                                      <SelectTrigger>
+                                        <SelectValue
+                                          placeholder={t("employeePlaceholder")}
+                                        />
+                                      </SelectTrigger>
+                                      <SelectContent>
+                                        {employees.map((emp) => (
                                           <SelectItem
                                             key={emp.id}
                                             value={String(emp.id)}
                                           >
+                                            {/* *** CORRECTED: Use .full_name property *** */}
                                             {emp.full_name}
                                           </SelectItem>
-                                        ))
-                                      ) : (
-                                        <SelectItem value="" disabled>
-                                          No employees available
-                                        </SelectItem>
+                                        ))}
+                                      </SelectContent>
+                                    </Select>
+                                  </div>
+                                  <DialogFooter>
+                                    <Button type="submit" disabled={isPending}>
+                                      {isPending && (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                                       )}
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <DialogFooter>
-                                  <Button type="submit" disabled={isPending}>
-                                    {isPending && (
-                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                    )}
-                                    {t("confirmButton")}
-                                  </Button>
-                                </DialogFooter>
-                              </form>
-                            </DialogContent>
-                          </Dialog>
-                        )}
+                                      {t("confirmButton")}
+                                    </Button>
+                                  </DialogFooter>
+                                </form>
+                              </DialogContent>
+                            </Dialog>
+                          )}
+                        </div>
                       </TableCell>
                     </TableRow>
                   )
