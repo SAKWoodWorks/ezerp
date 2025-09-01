@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server"
 import AssetClientPage from "./AssetClientPage"
 
+
 export default async function AssetsPage() {
   const supabase = await createClient()
 
+  
   // Fetch assets and employees in parallel
   const [assetsData, employeesData, warehousesData] = await Promise.all([
     supabase

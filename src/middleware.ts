@@ -44,7 +44,9 @@ export async function middleware(request: NextRequest) {
   const isLoginPage = url.pathname === "/login"
 
   // ตรวจสอบว่าเป็นหน้ารายละเอียดอุปกรณ์หรือไม่ (เช่น /assets/123)
-  const isPublicAssetPage = /^\/assets\/\d+$/.test(url.pathname)
+  //const isPublicAssetPage = /^\/assets\/\d+$/.test(url.pathname)
+  // ตรวจสอบว่าเป็นหน้ารายละเอียดอุปกรณ์ "สาธารณะ" หรือไม่ (เช่น /public/asset/123)
+  const isPublicAssetPage = /^\/public\/asset\/\d+$/.test(url.pathname)
 
   if (!user && !isLoginPage && !isPublicAssetPage) {
     // Redirect to login page if not authenticated
@@ -62,7 +64,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - /auth (for Supabase callback)
+     * - /public (ยกเว้นทุก path ภายใต้ /public)
      */
-    "/((?!_next/static|_next/image|favicon.ico|auth).*)",
+    "/((?!_next/static|_next/image|favicon.ico|auth|public).*)",
   ],
 }

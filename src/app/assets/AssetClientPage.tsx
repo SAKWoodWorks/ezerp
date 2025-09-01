@@ -18,19 +18,6 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -46,15 +33,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Plus, Loader2, UserPlus, ChevronsUpDown, Check } from "lucide-react"
+import { Plus, Loader2, UserPlus } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
-
 import AssetQRCodeDialog from "./AssetQRCodeDialog"
 
-// *** CORRECTED TYPE DEFINITIONS ***
 type Employee = { id: number; full_name: string }
-type Warehouse = { id: number; name: string }
 type Assignment = {
   id: number
   assignment_date: string
@@ -70,15 +53,15 @@ type Asset = {
   status: string
   asset_assignments: Assignment[]
 }
+type Warehouse = { id: number; name: string } // 1. เพิ่ม Type สำหรับ Warehouse
 
 interface Props {
   initialAssets: Asset[]
   employees: Employee[]
-  warehouses: Warehouse[] // Add warehouses to props
+  warehouses: Warehouse[] // 2. เพิ่ม warehouses เข้าไปใน Props
 }
 type BadgeVariant = "destructive" | "secondary" | "outline" | "success"
 
-// Helper to get status badge color
 const getStatusVariant = (status: string) => {
   switch (status) {
     case "Assigned":
@@ -92,16 +75,8 @@ const getStatusVariant = (status: string) => {
       return "success"
   }
 }
-export default function AssetClientPage({
-  initialAssets,
-  employees,
-  warehouses,
-}: // export default function AssetClientPage({
-//   initialAssets = [],
-//   employees = [],
-//   warehouses = [], // Add default empty array
-//}:
-Props) {
+
+export default function AssetClientPage({ initialAssets, employees }: Props) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState<number | null>(
     null
@@ -111,35 +86,11 @@ Props) {
   const t = useTranslations("AssetClientPage")
   const tCommon = useTranslations("Common")
 
-  // State for the new asset form
-  const [warehouseId, setWarehouseId] = useState<string>("")
-  const [warehousePopoverOpen, setWarehousePopoverOpen] = useState(false)
-
-  // const handleAddSubmit = (formData: FormData) => {
-  //   startTransition(async () => {
-  //     const result = await addAsset(formData)
-  //     if (result.success) {
-  //       setIsAddDialogOpen(false)
-  //     } else {
-  //       alert(`Error: ${result.error}`)
-  //     }
-  //   })
-  // }
   const handleAddSubmit = (formData: FormData) => {
-    // *** เพิ่มการตรวจสอบข้อมูลฝั่ง Client ***
-    if (!warehouseId) {
-      alert("กรุณาเลือกคลังสินค้า")
-      return
-    }
-
-    // Manually append the selected warehouse ID
-    formData.append("warehouseId", warehouseId)
-
     startTransition(async () => {
       const result = await addAsset(formData)
       if (result.success) {
         setIsAddDialogOpen(false)
-        setWarehouseId("") // Reset state
       } else {
         alert(`Error: ${result.error}`)
       }
@@ -159,17 +110,6 @@ Props) {
 
   const handleRowClick = (assetId: number) => {
     router.push(`/assets/${assetId}`)
-  }
-
-  // Show loading or error state if data is missing
-  if (!initialAssets || !employees || !warehouses) {
-    return (
-      <div className="p-8">
-        <div className="text-center">
-          <p className="text-muted-foreground">Loading assets data...</p>
-        </div>
-      </div>
-    )
   }
 
   return (
@@ -208,57 +148,6 @@ Props) {
               <div className="space-y-2">
                 <Label htmlFor="serial_number">Serial Number</Label>
                 <Input id="serial_number" name="serial_number" />
-              </div>
-              <div className="space-y-2">
-                <Label>คลังสินค้า</Label>
-                <Popover
-                  open={warehousePopoverOpen}
-                  onOpenChange={setWarehousePopoverOpen}
-                >
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant="outline"
-                      role="combobox"
-                      className="w-full justify-between"
-                    >
-                      {warehouseId
-                        ? warehouses.find((w) => String(w.id) === warehouseId)
-                            ?.name
-                        : "-- เลือกคลังสินค้า --"}
-                      <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                    <Command>
-                      <CommandInput placeholder="ค้นหาคลังสินค้า..." />
-                      <CommandList>
-                        <CommandEmpty>ไม่พบคลังสินค้า</CommandEmpty>
-                        <CommandGroup>
-                          {warehouses.map((w) => (
-                            <CommandItem
-                              key={w.id}
-                              value={w.name}
-                              onSelect={() => {
-                                setWarehouseId(String(w.id))
-                                setWarehousePopoverOpen(false)
-                              }}
-                            >
-                              <Check
-                                className={cn(
-                                  "mr-2 h-4 w-4",
-                                  warehouseId === String(w.id)
-                                    ? "opacity-100"
-                                    : "opacity-0"
-                                )}
-                              />
-                              {w.name}
-                            </CommandItem>
-                          ))}
-                        </CommandGroup>
-                      </CommandList>
-                    </Command>
-                  </PopoverContent>
-                </Popover>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="purchase_date">{t("purchase_date")}</Label>
@@ -305,128 +194,128 @@ Props) {
                 <TableHead>{t("tableHeaderModel")}</TableHead>
                 <TableHead>{t("tableHeaderStatus")}</TableHead>
                 <TableHead>{t("tableHeaderUser")}</TableHead>
-                <TableHead></TableHead>
+                <TableHead className="w-[150px]">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {initialAssets && initialAssets.length > 0 ? (
-                initialAssets.map((asset) => {
-                  const currentAssignment = asset.asset_assignments?.find(
-                    (a) => a.return_date === null
-                  )
-                  const assignedEmployee = employees?.find(
-                    (emp) => emp.id === currentAssignment?.employee_id
-                  )
+              {initialAssets.map((asset) => {
+                const currentAssignment = asset.asset_assignments.find(
+                  (a) => a.return_date === null
+                )
+                const assignedEmployee = employees.find(
+                  (emp) => emp.id === currentAssignment?.employee_id
+                )
 
-                  return (
-                    <TableRow
-                      key={asset.id}
+                return (
+                  <TableRow key={asset.id}>
+                    <TableCell
+                      className="font-medium cursor-pointer"
+                      onClick={() => handleRowClick(asset.id)}
+                    >
+                      {asset.asset_tag}
+                    </TableCell>
+                    <TableCell
                       className="cursor-pointer"
                       onClick={() => handleRowClick(asset.id)}
                     >
-                      <TableCell className="font-medium">
-                        {asset.asset_tag}
-                      </TableCell>
-                      <TableCell>{asset.type}</TableCell>
-                      <TableCell>{asset.model}</TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={
-                            getStatusVariant(asset.status) as BadgeVariant
-                          }
-                        >
-                          {asset.status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        {assignedEmployee ? assignedEmployee.full_name : "-"}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <div className="flex items-center justify-end gap-2">
-                          <AssetQRCodeDialog asset={asset} />
-                          {asset.status === "In Stock" && (
-                            <Dialog
-                              open={isAssignDialogOpen === asset.id}
-                              onOpenChange={(isOpen) =>
-                                setIsAssignDialogOpen(isOpen ? asset.id : null)
-                              }
-                            >
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={(e) => e.stopPropagation()}
-                                >
-                                  <UserPlus className="mr-2 h-4 w-4" />
-                                  {t("AssigntoButton")}
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent>
-                                <DialogHeader>
-                                  <DialogTitle>
-                                    {t("AssigntoTitle")}
-                                  </DialogTitle>
-                                  <DialogDescription>
-                                    {t("AssigntoDescription")} {asset.asset_tag}{" "}
-                                    ({asset.type})
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <form action={handleAssignSubmit}>
-                                  <input
-                                    type="hidden"
-                                    name="assetId"
-                                    value={asset.id}
-                                  />
-                                  <div className="py-4">
-                                    <Label htmlFor="employeeId">
-                                      {t("employee")}:
-                                    </Label>
-                                    <Select name="employeeId" required>
-                                      <SelectTrigger>
-                                        <SelectValue
-                                          placeholder={t("employeePlaceholder")}
-                                        />
-                                      </SelectTrigger>
-                                      <SelectContent>
-                                        {employees.map((emp) => (
-                                          <SelectItem
-                                            key={emp.id}
-                                            value={String(emp.id)}
-                                          >
-                                            {/* *** CORRECTED: Use .full_name property *** */}
-                                            {emp.full_name}
-                                          </SelectItem>
-                                        ))}
-                                      </SelectContent>
-                                    </Select>
-                                  </div>
-                                  <DialogFooter>
-                                    <Button type="submit" disabled={isPending}>
-                                      {isPending && (
-                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                      )}
-                                      {t("confirmButton")}
-                                    </Button>
-                                  </DialogFooter>
-                                </form>
-                              </DialogContent>
-                            </Dialog>
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={6}
-                    className="text-center text-muted-foreground"
-                  >
-                    No assets found
-                  </TableCell>
-                </TableRow>
-              )}
+                      {asset.type}
+                    </TableCell>
+                    <TableCell
+                      className="cursor-pointer"
+                      onClick={() => handleRowClick(asset.id)}
+                    >
+                      {asset.model}
+                    </TableCell>
+                    <TableCell
+                      className="cursor-pointer"
+                      onClick={() => handleRowClick(asset.id)}
+                    >
+                      <Badge
+                        variant={getStatusVariant(asset.status) as BadgeVariant}
+                      >
+                        {asset.status}
+                      </Badge>
+                    </TableCell>
+                    <TableCell
+                      className="cursor-pointer"
+                      onClick={() => handleRowClick(asset.id)}
+                    >
+                      {assignedEmployee ? assignedEmployee.full_name : "-"}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <AssetQRCodeDialog asset={asset} />
+
+                        {asset.status === "In Stock" && (
+                          <Dialog
+                            open={isAssignDialogOpen === asset.id}
+                            onOpenChange={(isOpen) =>
+                              setIsAssignDialogOpen(isOpen ? asset.id : null)
+                            }
+                          >
+                            <DialogTrigger asChild>
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <UserPlus className="mr-2 h-4 w-4" />
+                                {t("AssigntoButton")}
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent>
+                              <DialogHeader>
+                                <DialogTitle>{t("AssigntoTitle")}</DialogTitle>
+                                <DialogDescription>
+                                  {t("AssigntoDescription")} {asset.asset_tag} (
+                                  {asset.type})
+                                </DialogDescription>
+                              </DialogHeader>
+                              <form action={handleAssignSubmit}>
+                                <input
+                                  type="hidden"
+                                  name="assetId"
+                                  value={asset.id}
+                                />
+                                <div className="py-4">
+                                  <Label htmlFor="employeeId">
+                                    {t("employee")}:
+                                  </Label>
+                                  <Select name="employeeId" required>
+                                    <SelectTrigger>
+                                      <SelectValue
+                                        placeholder={t("employeePlaceholder")}
+                                      />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      {employees.map((emp) => (
+                                        <SelectItem
+                                          key={emp.id}
+                                          value={String(emp.id)}
+                                        >
+                                          {emp.full_name}
+                                        </SelectItem>
+                                      ))}
+                                    </SelectContent>
+                                  </Select>
+                                </div>
+                                <DialogFooter>
+                                  <Button type="submit" disabled={isPending}>
+                                    {isPending && (
+                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    )}
+                                    {t("confirmButton")}
+                                  </Button>
+                                </DialogFooter>
+                              </form>
+                            </DialogContent>
+                          </Dialog>
+                        )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                )
+              })}
             </TableBody>
           </Table>
         </CardContent>
