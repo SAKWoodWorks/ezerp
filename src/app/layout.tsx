@@ -34,12 +34,12 @@ export default async function RootLayout({
       <body className={sarabun.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {user ? (
-            <div className="flex bg-gray-100 font-sans">
+            <div className="flex min-h-screen bg-gray-100 font-sans">
               <Sidebar />
               <main className="flex-1">{children}</main>
             </div>
           ) : (
-            <div className="bg-gray-100 font-sans">{children}</div>
+            <div className="min-h-screen bg-gray-100 font-sans">{children}</div>
           )}
         </NextIntlClientProvider>
       </body>

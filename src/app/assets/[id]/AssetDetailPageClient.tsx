@@ -2,14 +2,14 @@
 
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
+// import {
+//   Table,
+//   TableBody,
+//   TableCell,
+//   TableHead,
+//   TableHeader,
+//   TableRow,
+// } from "@/components/ui/table"
 import {
   ArrowLeft,
   Calendar,
@@ -19,11 +19,16 @@ import {
   DollarSign,
   Warehouse,
   ClipboardList,
+  Wrench,
+  MessageSquare,
+  //Tool,
+  Store,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import ReturnAssetButton from "./ReturnAssetButton"
 import EditAssetForm from "./EditAssetForm"
 import UpdateStatusButton from "./UpdateStatusButton"
+import AddRepairDialog from "./AddRepairDialog"
 import { Badge } from "@/components/ui/badge"
 import type { User as SupabaseUser } from "@supabase/supabase-js"
 
@@ -32,12 +37,21 @@ type Employee = {
   id: number
   full_name: string
 }
-type Warehouse = { id: number; name: string } // Add Warehouse type
+type WarehouseInfo = { id: number; name: string }
 type Assignment = {
   id: number
   assignment_date: string
   return_date: string | null
   employees: Employee | null
+}
+type RepairHistory = {
+  id: number
+  repair_date_in: string
+  repair_date_out: string | null
+  description: string | null
+  repair_notes: string | null
+  repair_shop: string | null
+  cost: number | null
 }
 type Asset = {
   id: number
@@ -50,12 +64,13 @@ type Asset = {
   status: string
   notes: string | null
   asset_assignments: Assignment[]
+  asset_repairs: RepairHistory[]
   warehouse_id: number | null
 }
 
 interface ClientProps {
   asset: Asset
-  warehouses: Warehouse[] // Receive warehouses
+  warehouses: WarehouseInfo[]
   user: SupabaseUser | null
 }
 
@@ -69,7 +84,7 @@ const formatDate = (dateString: string | null) => {
 }
 type BadgeVariant = "destructive" | "secondary" | "outline" | "success"
 
-const getStatusVariant = (status: string) => {
+const getStatusVariant = (status: string): BadgeVariant => {
   switch (status) {
     case "Assigned":
       return "destructive"
@@ -83,16 +98,66 @@ const getStatusVariant = (status: string) => {
   }
 }
 
+// Timeline Item Component
+const TimelineItem = ({
+  date,
+  title,
+  description,
+  icon,
+  children,
+}: {
+  date: string
+  title: string
+  description?: string | null
+  icon: React.ElementType
+  children?: React.ReactNode
+}) => {
+  const Icon = icon
+  return (
+    <div className="flex gap-x-3">
+      <div className="relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-1/2 after:bg-border">
+        <div className="relative z-10 size-7 flex justify-center items-center">
+          <div className="size-2 rounded-full bg-muted-foreground/30 ring-4 ring-background"></div>
+        </div>
+      </div>
+      <div className="grow pt-1 pb-8">
+        <div className="flex gap-x-2 items-center">
+          <Icon className="w-4 h-4 text-muted-foreground" />
+          <h3 className="font-semibold text-foreground">{title}</h3>
+          <p className="text-xs text-muted-foreground ml-auto">{date}</p>
+        </div>
+        {description && (
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        )}
+        {children}
+      </div>
+    </div>
+  )
+}
+
 export default function AssetDetailPageClient({
   asset,
   warehouses,
   user,
 }: ClientProps) {
   const t = useTranslations("AssetDetailPageClient")
-  const currentAssignment = asset.asset_assignments.find(
-    (a) => a.return_date === null
-  )
+  const currentAssignment =
+    asset.asset_assignments?.find((a) => a.return_date === null) || null
   const assetWarehouse = warehouses.find((w) => w.id === asset.warehouse_id)
+
+  const timelineEvents = [
+    ...(asset.asset_assignments || []).map((a) => ({
+      date: new Date(a.assignment_date),
+      type: "assignment" as const,
+      data: a,
+    })),
+    ...(asset.asset_repairs || []).map((r) => ({
+      date: new Date(r.repair_date_in),
+      type: "repair" as const,
+      data: r,
+    })),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime())
+
   return (
     <div className="p-8 space-y-6">
       <div className="flex justify-between items-center">
@@ -116,7 +181,10 @@ export default function AssetDetailPageClient({
             </Badge>
           </div>
         </div>
-        <UpdateStatusButton assetId={asset.id} currentStatus={asset.status} />
+        <div className="flex items-center gap-2">
+          <AddRepairDialog assetId={asset.id} />
+          <UpdateStatusButton assetId={asset.id} currentStatus={asset.status} />
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -140,7 +208,6 @@ export default function AssetDetailPageClient({
               <strong>{t("serialNumber")}:</strong>
               <span className="ml-2">{asset.serial_number || "-"}</span>
             </div>
-            {/* --- 2. เพิ่มส่วนแสดงผลคลังสินค้า --- */}
             <div className="flex items-center">
               <Warehouse className="w-4 h-4 mr-2 text-muted-foreground" />
               <strong>คลังสินค้า:</strong>
@@ -193,38 +260,85 @@ export default function AssetDetailPageClient({
         </Card>
       </div>
 
-      {/* ส่ง warehouses ไปให้ EditForm */}
       {user && <EditAssetForm asset={asset} warehouses={warehouses} />}
 
       <Card>
         <CardHeader>
-          <CardTitle>{t("historyTitle")}</CardTitle>
+          <CardTitle>ประวัติและไทม์ไลน์</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>{t("historyTableHeadEmployees")}</TableHead>
-                <TableHead>{t("historyTableHeadAssignDate")}</TableHead>
-                <TableHead>{t("historyTableHeadReturnDate")}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {asset.asset_assignments.map((assignment) => (
-                <TableRow key={assignment.id}>
-                  <TableCell>
-                    {assignment.employees
-                      ? assignment.employees.full_name
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {formatDate(assignment.assignment_date)}
-                  </TableCell>
-                  <TableCell>{formatDate(assignment.return_date)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {timelineEvents.length > 0 ? (
+            timelineEvents.map((event, index) => {
+              if (event.type === "assignment") {
+                const { data } = event
+                return (
+                  <TimelineItem
+                    key={`assign-${index}`}
+                    date={formatDate(data.assignment_date)}
+                    title={`เบิกจ่ายให้: ${data.employees?.full_name || "N/A"}`}
+                    description={
+                      data.return_date
+                        ? `คืนเมื่อ: ${formatDate(data.return_date)}`
+                        : "กำลังใช้งาน"
+                    }
+                    icon={User}
+                  />
+                )
+              } else if (event.type === "repair") {
+                const { data } = event
+                return (
+                  <TimelineItem
+                    key={`repair-${index}`}
+                    date={formatDate(data.repair_date_in)}
+                    title="ส่งซ่อม"
+                    icon={Wrench}
+                  >
+                    <div className="mt-2 text-sm text-muted-foreground space-y-2">
+                      <div className="flex items-start gap-2">
+                        <MessageSquare className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>อาการที่เสีย:</strong>{" "}
+                          {data.description || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Store className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>ส่งซ่อมที่:</strong> {data.repair_shop || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Wrench className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>บันทึกการซ่อม:</strong>{" "}
+                          {data.repair_notes || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <DollarSign className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>ค่าใช้จ่าย:</strong>{" "}
+                          {data.cost?.toLocaleString() || "0"} บาท
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Calendar className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>วันที่รับคืน:</strong>{" "}
+                          {formatDate(data.repair_date_out)}
+                        </p>
+                      </div>
+                    </div>
+                  </TimelineItem>
+                )
+              }
+              return null
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground text-center">
+              ยังไม่มีประวัติ
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>

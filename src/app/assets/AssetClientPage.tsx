@@ -53,12 +53,12 @@ type Asset = {
   status: string
   asset_assignments: Assignment[]
 }
-type Warehouse = { id: number; name: string } // 1. เพิ่ม Type สำหรับ Warehouse
+type Warehouse = { id: number; name: string }
 
 interface Props {
   initialAssets: Asset[]
   employees: Employee[]
-  warehouses: Warehouse[] // 2. เพิ่ม warehouses เข้าไปใน Props
+  warehouses: Warehouse[]
 }
 type BadgeVariant = "destructive" | "secondary" | "outline" | "success"
 
@@ -76,7 +76,11 @@ const getStatusVariant = (status: string) => {
   }
 }
 
-export default function AssetClientPage({ initialAssets, employees }: Props) {
+export default function AssetClientPage({
+  initialAssets,
+  employees,
+  warehouses,
+}: Props) {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
   const [isAssignDialogOpen, setIsAssignDialogOpen] = useState<number | null>(
     null
@@ -148,6 +152,21 @@ export default function AssetClientPage({ initialAssets, employees }: Props) {
               <div className="space-y-2">
                 <Label htmlFor="serial_number">Serial Number</Label>
                 <Input id="serial_number" name="serial_number" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="warehouseId">Warehouse</Label>
+                <Select name="warehouseId" required>
+                  <SelectTrigger>
+                    <SelectValue placeholder="-- Select a warehouse --" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {warehouses.map((wh) => (
+                      <SelectItem key={wh.id} value={String(wh.id)}>
+                        {wh.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="purchase_date">{t("purchase_date")}</Label>

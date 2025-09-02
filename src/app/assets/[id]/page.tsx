@@ -11,7 +11,7 @@ export default async function AssetDetailPage({ params }: PageProps) {
   const { id } = await params
   const supabase = await createClient()
 
-  // Fetch asset, warehouses, and user data concurrently
+  // Fetch asset, warehouses, user data and repair history concurrently
   const [assetData, warehousesData, userData] = await Promise.all([
     supabase
       .from("office_assets")
@@ -24,15 +24,12 @@ export default async function AssetDetailPage({ params }: PageProps) {
           assignment_date,
           return_date,
           employees ( id, full_name )
-        )
+        ),
+        asset_repairs ( * )
       `
       )
       .eq("id", id)
-      .order("assignment_date", {
-        referencedTable: "asset_assignments",
-        ascending: false,
-      })
-      .single(),
+      .single(), // Simplified query by removing ordering here
     supabase.from("warehouses").select("id, name"),
     supabase.auth.getUser(),
   ])
@@ -50,7 +47,6 @@ export default async function AssetDetailPage({ params }: PageProps) {
     notFound()
   }
 
-  // Pass asset, warehouses, and user data to Client Component
   return (
     <AssetDetailPageClient
       asset={asset}

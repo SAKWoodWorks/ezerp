@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 
-// Action to add a new office asset
+// ... (โค้ดฟังก์ชันอื่นๆ เช่น addAsset, updateAsset) ...
 export async function addAsset(formData: FormData) {
   const supabase = await createClient()
   const {
@@ -212,6 +212,40 @@ export async function updateAssetStatus(assetId: number, newStatus: string) {
   }
 
   revalidatePath("/assets")
+  revalidatePath(`/assets/${assetId}`)
+  return { success: true }
+}
+
+export async function addRepairHistory(formData: FormData) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: "Authentication required" }
+
+  const assetId = Number(formData.get("assetId"))
+
+  const repairData = {
+    asset_id: assetId,
+    repair_date_in: formData.get("repair_date_in") as string,
+    repair_date_out: (formData.get("repair_date_out") as string) || null,
+    description: formData.get("description") as string,
+    repair_notes: formData.get("repair_notes") as string,
+    repair_shop: (formData.get("repair_shop") as string) || null,
+    cost: Number(formData.get("cost")),
+  }
+
+  if (!repairData.asset_id || !repairData.repair_date_in) {
+    return { error: "Asset ID and repair date are required." }
+  }
+
+  const { error } = await supabase.from("asset_repairs").insert(repairData)
+
+  if (error) {
+    console.error("Error adding repair history:", error)
+    return { error: "Could not add repair history." }
+  }
+
   revalidatePath(`/assets/${assetId}`)
   return { success: true }
 }
