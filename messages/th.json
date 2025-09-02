@@ -541,6 +541,8 @@
     "backlink": "กลับไปหน้ารายการทรัพย์สิน",
     "title": "ข้อมูลทรัพย์สิน",
     "id": "ID",
+    "type": "ประเภท",
+    "model": "รุ่น/ยี่ห้อ",
     "serialNumber": "Serial Number",
     "purchaseDate": "วันที่ซื้อ",
     "purchasePrice": "ราคาซื้อ (บาท)",

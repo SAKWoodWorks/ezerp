@@ -18,6 +18,7 @@ import {
   User,
   DollarSign,
   Warehouse,
+  ClipboardList,
 } from "lucide-react"
 import { useTranslations } from "next-intl"
 import ReturnAssetButton from "./ReturnAssetButton"
@@ -128,6 +129,11 @@ export default function AssetDetailPageClient({
               <Tag className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
               <strong>{t("id")}:</strong>
               <span className="ml-2">{asset.asset_tag}</span>
+            </div>
+            <div className="flex items-center">
+              <ClipboardList className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
+              <strong>{t("type")}:</strong>
+              <span className="ml-2">{asset.type}</span>
             </div>
             <div className="flex items-center">
               <Hash className="w-4 h-4 mr-2 text-muted-foreground" />{" "}

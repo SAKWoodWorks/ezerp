@@ -94,6 +94,11 @@ export default function AssetPublicView({ asset }: Props) {
               <span className="ml-2">{asset.asset_tag}</span>
             </div>
             <div className="flex items-center">
+              <Tag className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
+              <strong>ประเภท:</strong>
+              <span className="ml-2">{asset.type}</span>
+            </div>
+            <div className="flex items-center">
               <Hash className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
               <strong>Serial Number:</strong>
               <span className="ml-2">{asset.serial_number || "-"}</span>

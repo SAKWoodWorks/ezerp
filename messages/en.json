@@ -527,6 +527,8 @@
     "backlink": "Back to Asset Client List",
     "title": "Asset Client Details",
     "id": "ID",
+    "type": "Type",
+    "model": "Model",
     "serialNumber": "Serial Number",
     "purchaseDate": "Purchase Date",
     "purchasePrice": "Purchase Price (THB)",

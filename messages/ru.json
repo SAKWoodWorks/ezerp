@@ -527,6 +527,8 @@
     "backlink": "Вернуться к списку оборудования",
     "title": "Оборудование",
     "id": "ID",
+    "type": "Тип",
+    "model": "Модель",
     "serialNumber": "Serial Number",
     "purchaseDate": "Дата покупки",
     "purchasePrice": "Цена покупки (руб.)",
