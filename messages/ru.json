@@ -552,7 +552,8 @@
     "accepted": "Принят",
     "rejected": "Отклонен",
     "draft": "Черновик",
-    "sent": "Отправлен"
+    "sent": "Отправлен",
+    "paid": "Оплачен"
   },
   "UpdateStatusBUtton": {
     "errorUpdate": "Произошла ошибка",

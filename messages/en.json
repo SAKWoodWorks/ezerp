@@ -552,7 +552,8 @@
     "accepted": "Accepted",
     "rejected": "Rejected",
     "draft": "Draft",
-    "sent": "Sent"
+    "sent": "Sent",
+    "paid": "Paid"
   },
   "UpdateStatusBUtton": {
     "errorUpdate": "An error occurred",

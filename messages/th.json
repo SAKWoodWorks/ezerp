@@ -487,7 +487,8 @@
     "accepted": "อนุมัติ",
     "rejected": "ปฏิเสธ",
     "draft": "ฉบับร่าง",
-    "sent": "ส่งแล้ว"
+    "sent": "ส่งแล้ว",
+    "paid": "ชำระแล้ว"
   },
   "UpdateStatusBUtton": {
     "errorUpdate": "เกิดข้อผิดพลาด",

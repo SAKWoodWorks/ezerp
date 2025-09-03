@@ -283,3 +283,25 @@ export async function createInvoiceFromQuotation(quotationId: number) {
   // 5. ส่งกลับ ID ของ Invoice ที่สร้างใหม่เพื่อ Redirect
   return { success: true, newInvoiceId: newInvoice.id }
 }
+
+// ฟังก์ชันใหม่สำหรับสร้างใบเสร็จจากใบแจ้งหนี้
+export async function createReceiptFromInvoiceAction(invoiceId: number) {
+  const supabase = await createClient()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+  if (!user) return { error: "Authentication required" }
+
+  const { data, error } = await supabase.rpc("create_receipt_from_invoice", {
+    p_invoice_id: invoiceId,
+  })
+
+  if (error) {
+    console.error("Error from RPC create_receipt_from_invoice:", error)
+    return { error: error.message || "Failed to create receipt." }
+  }
+
+  revalidatePath("/cash-bills")
+
+  return { success: true, newReceiptId: data }
+}

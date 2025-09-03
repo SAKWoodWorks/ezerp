@@ -6,6 +6,7 @@ import Image from "next/image"
 import UpdateStatusButton from "./UpdateStatusButton"
 import InvoicePrintDropdown from "./InvoicePrintDropdown"
 import DeleteInvoiceButton from "./DeleteInvoiceButton"
+import PrintReceiptButton from "./PrintReceiptButton" // เพิ่ม Component ใหม่
 import { Button } from "@/components/ui/button"
 import {
   Table,
@@ -160,6 +161,10 @@ export default async function InvoiceDetailPage(props: {
             {/* <InvoicePrintDropdown invoiceNumber={invoice.invoice_number} /> */}
             {/* <InvoicePrintDropdown invoice={invoice} /> */}
             <InvoicePrintDropdown invoiceNumber={invoice.invoice_number} />
+            {/* --- เพิ่มปุ่มพิมพ์ใบเสร็จตรงนี้ --- */}
+            {invoice.status === "Paid" && (
+              <PrintReceiptButton invoiceId={invoice.id} />
+            )}
             <Button asChild variant="outline">
               <Link href={`/invoices/${invoice.id}/edit`}>
                 <Pencil size={16} className="mr-2" /> {t("editButton")}
