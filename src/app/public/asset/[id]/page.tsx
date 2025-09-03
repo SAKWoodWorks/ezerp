@@ -29,12 +29,17 @@ export default async function AssetPublicPage(props: {
         assignment_date,
         return_date,
         employees ( id, full_name )
-      )
+      ),
+      asset_repairs ( * )
     `
     )
     .eq("id", id)
     .order("assignment_date", {
       referencedTable: "asset_assignments",
+      ascending: false,
+    })
+    .order("repair_date_in", {
+      referencedTable: "asset_repairs",
       ascending: false,
     })
     .single()

@@ -2,14 +2,17 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Calendar, Tag, Hash, User, DollarSign, Warehouse } from "lucide-react"
+  Calendar,
+  Tag,
+  Hash,
+  User,
+  DollarSign,
+  Warehouse,
+  Wrench,
+  MessageSquare,
+  ClipboardList,
+  Store,
+} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 
 // Type Definitions
@@ -23,6 +26,15 @@ type Assignment = {
   return_date: string | null
   employees: Employee | null
 }
+type RepairHistory = {
+  id: number
+  repair_date_in: string
+  repair_date_out: string | null
+  description: string | null
+  repair_notes: string | null
+  repair_shop: string | null
+  cost: number | null
+}
 type Asset = {
   id: number
   asset_tag: string
@@ -34,6 +46,7 @@ type Asset = {
   status: string
   notes: string | null
   asset_assignments: Assignment[]
+  asset_repairs: RepairHistory[] // เพิ่ม field นี้
   warehouses: { name: string } | null
 }
 
@@ -66,10 +79,60 @@ const getStatusVariant = (status: string): BadgeVariant => {
   }
 }
 
-export default function AssetPublicView({ asset }: Props) {
-  const currentAssignment = asset.asset_assignments.find(
-    (a) => a.return_date === null
+// Timeline Item Component
+const TimelineItem = ({
+  date,
+  title,
+  description,
+  icon,
+  children,
+}: {
+  date: string
+  title: string
+  description?: string | null
+  icon: React.ElementType
+  children?: React.ReactNode
+}) => {
+  const Icon = icon
+  return (
+    <div className="flex gap-x-3">
+      <div className="relative last:after:hidden after:absolute after:top-7 after:bottom-0 after:start-3.5 after:w-px after:-translate-x-1/2 after:bg-border">
+        <div className="relative z-10 size-7 flex justify-center items-center">
+          <div className="size-2 rounded-full bg-muted-foreground/30 ring-4 ring-background"></div>
+        </div>
+      </div>
+      <div className="grow pt-1 pb-8">
+        <div className="flex gap-x-2 items-center">
+          <Icon className="w-4 h-4 text-muted-foreground" />
+          <h3 className="font-semibold text-foreground">{title}</h3>
+          <p className="text-xs text-muted-foreground ml-auto">{date}</p>
+        </div>
+        {description && (
+          <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+        )}
+        {children}
+      </div>
+    </div>
   )
+}
+
+export default function AssetPublicView({ asset }: Props) {
+  const currentAssignment =
+    asset.asset_assignments?.find((a) => a.return_date === null) || null
+
+  // สร้างข้อมูลสำหรับ Timeline
+  const timelineEvents = [
+    ...(asset.asset_assignments || []).map((a) => ({
+      date: new Date(a.assignment_date),
+      type: "assignment" as const,
+      data: a,
+    })),
+    ...(asset.asset_repairs || []).map((r) => ({
+      date: new Date(r.repair_date_in),
+      type: "repair" as const,
+      data: r,
+    })),
+  ].sort((a, b) => b.date.getTime() - a.date.getTime())
 
   return (
     <div className="p-4 sm:p-8 space-y-6 bg-gray-50 min-h-screen">
@@ -94,11 +157,6 @@ export default function AssetPublicView({ asset }: Props) {
               <span className="ml-2">{asset.asset_tag}</span>
             </div>
             <div className="flex items-center">
-              <Tag className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
-              <strong>ประเภท:</strong>
-              <span className="ml-2">{asset.type}</span>
-            </div>
-            <div className="flex items-center">
               <Hash className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
               <strong>Serial Number:</strong>
               <span className="ml-2">{asset.serial_number || "-"}</span>
@@ -117,12 +175,6 @@ export default function AssetPublicView({ asset }: Props) {
               <DollarSign className="w-4 h-4 mr-2 text-muted-foreground" />{" "}
               <strong>ราคาซื้อ:</strong>
               <span className="ml-2">{asset.purchase_price || "-"} บาท</span>
-            </div>
-            <div>
-              <strong>หมายเหตุ:</strong>
-              <p className="text-sm text-muted-foreground">
-                {asset.notes || "-"}
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -149,35 +201,84 @@ export default function AssetPublicView({ asset }: Props) {
         </Card>
       </div>
 
+      {/* เพิ่ม Card สำหรับ Timeline */}
       <Card>
         <CardHeader>
-          <CardTitle>ประวัติการเบิกจ่าย</CardTitle>
+          <CardTitle>ประวัติและไทม์ไลน์</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>พนักงาน</TableHead>
-                <TableHead>วันที่เบิกจ่าย</TableHead>
-                <TableHead>วันที่คืน</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {asset.asset_assignments.map((assignment) => (
-                <TableRow key={assignment.id}>
-                  <TableCell>
-                    {assignment.employees
-                      ? assignment.employees.full_name
-                      : "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {formatDate(assignment.assignment_date)}
-                  </TableCell>
-                  <TableCell>{formatDate(assignment.return_date)}</TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          {timelineEvents.length > 0 ? (
+            timelineEvents.map((event, index) => {
+              if (event.type === "assignment") {
+                const { data } = event
+                return (
+                  <TimelineItem
+                    key={`assign-${index}`}
+                    date={formatDate(data.assignment_date)}
+                    title={`เบิกจ่ายให้: ${data.employees?.full_name || "N/A"}`}
+                    description={
+                      data.return_date
+                        ? `คืนเมื่อ: ${formatDate(data.return_date)}`
+                        : "กำลังใช้งาน"
+                    }
+                    icon={User}
+                  />
+                )
+              } else if (event.type === "repair") {
+                const { data } = event
+                return (
+                  <TimelineItem
+                    key={`repair-${index}`}
+                    date={formatDate(data.repair_date_in)}
+                    title="ส่งซ่อม"
+                    icon={Wrench}
+                  >
+                    <div className="mt-2 text-sm text-muted-foreground space-y-2">
+                      <div className="flex items-start gap-2">
+                        <MessageSquare className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>อาการที่เสีย:</strong>{" "}
+                          {data.description || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Store className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>ส่งซ่อมที่:</strong> {data.repair_shop || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <ClipboardList className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>บันทึกการซ่อม:</strong>{" "}
+                          {data.repair_notes || "-"}
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <DollarSign className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>ค่าใช้จ่าย:</strong>{" "}
+                          {data.cost?.toLocaleString() || "0"} บาท
+                        </p>
+                      </div>
+                      <div className="flex items-start gap-2">
+                        <Calendar className="w-4 h-4 mt-0.5" />
+                        <p>
+                          <strong>วันที่รับคืน:</strong>{" "}
+                          {formatDate(data.repair_date_out)}
+                        </p>
+                      </div>
+                    </div>
+                  </TimelineItem>
+                )
+              }
+              return null
+            })
+          ) : (
+            <p className="text-sm text-muted-foreground text-center">
+              ยังไม่มีประวัติ
+            </p>
+          )}
         </CardContent>
       </Card>
     </div>
