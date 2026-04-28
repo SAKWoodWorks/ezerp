@@ -22,6 +22,7 @@ import {
   Receipt,
   Laptop,
   PieChart,
+  ShoppingCart,
   //BookUser,
 } from "lucide-react"
 import { logout } from "./actions"
@@ -111,6 +112,7 @@ export default function Sidebar() {
     {
       title: tSections("sales"),
       items: [
+        { href: "/pos", label: t("pos"), icon: ShoppingCart },
         { href: "/customers", label: t("customers"), icon: Users },
         { href: "/quotations", label: t("quotations"), icon: ClipboardList },
         { href: "/invoices", label: t("invoices"), icon: FileText },
