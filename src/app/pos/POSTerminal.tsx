@@ -19,8 +19,7 @@ export type Product = {
   id: number
   name: string
   barcode: string | null
-  selling_price: number | null
-  unit: string | null
+  price: number | null
 }
 
 export type Customer = { id: number; name: string }
@@ -66,7 +65,7 @@ export default function POSTerminal({
           productId: product.id,
           description: product.name,
           quantity: 1,
-          unitPrice: product.selling_price ?? 0,
+          unitPrice: product.price ?? 0,
           ecommerce_size: null,
         },
       ]

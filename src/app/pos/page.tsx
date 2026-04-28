@@ -15,7 +15,7 @@ export default async function POSPage() {
   const [productsRes, customersRes, warehousesRes] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, barcode, selling_price, unit")
+      .select("id, name, barcode, price")
       .order("name"),
     supabase.from("customers").select("id, name").order("name"),
     supabase.from("warehouses").select("id, name").order("name"),

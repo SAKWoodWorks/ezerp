@@ -77,8 +77,7 @@ export default function ProductSearch({
           >
             <div className="truncate font-medium text-sm">{product.name}</div>
             <div className="mt-1 text-sm text-muted-foreground">
-              ฿{(product.selling_price ?? 0).toLocaleString()} /{" "}
-              {product.unit ?? "unit"}
+              ฿{(product.price ?? 0).toLocaleString()}
             </div>
           </button>
         ))}
