@@ -14,7 +14,8 @@
     "accounting": "Бухгалтерия",
     "reports": "Отчеты",
     "settings": "Настройки",
-    "logout": "Выйти"
+    "logout": "Выйти",
+    "pos": "POS"
   },
   "SidebarSections": {
     "main": "Основное меню",
@@ -606,5 +607,32 @@
     "loading": "Загрузка...",
     "pleaseFillAllFields": "Пожалуйста, заполните все обязательные поля.",
     "invalidData": "Неверные данные."
+  },
+  "POS": {
+    "title": "Касса",
+    "searchPlaceholder": "Поиск товаров или сканирование...",
+    "scan": "Сканировать",
+    "scanTitle": "Сканер штрих-кодов",
+    "scanDescription": "Наведите камеру на штрих-код или QR-код",
+    "noProducts": "Товары не найдены",
+    "itemCount": "{count} позиций в корзине",
+    "selectCustomer": "Выбрать клиента (необязательно)",
+    "selectWarehouse": "Выбрать склад *",
+    "emptyCart": "Корзина пуста",
+    "total": "Итого",
+    "checkout": "Оплатить",
+    "warehouseRequired": "Выберите склад перед оплатой",
+    "payment": "Оплата",
+    "method_cash": "Наличные",
+    "method_transfer": "Перевод",
+    "method_qrcode": "QR-код",
+    "cashReceived": "Получено наличных",
+    "change": "Сдача",
+    "uploadSlip": "Загрузить квитанцию",
+    "tapToUpload": "Нажмите для загрузки изображения",
+    "uploading": "Загрузка...",
+    "slipRequired": "Загрузите квитанцию об оплате",
+    "processing": "Обработка...",
+    "confirmSale": "Подтвердить продажу"
   }
 }

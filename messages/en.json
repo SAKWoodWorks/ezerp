@@ -13,7 +13,8 @@
     "accounting": "Accounting",
     "reports": "Reports",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "pos": "POS"
   },
   "SidebarSections": {
     "main": "Main Menu",
@@ -142,7 +143,7 @@
     "addNewItemDescLabel": "Product Description",
     "thickness": "Thickness (mm)",
     "width": "Width (mm)",
-    "length": "Length (mm)",
+    "length": "Length (m)",
     "addNewItemPriceLabel": "Price (Baht)",
     "stockQuantity": "Stock Quantity",
     "lowStockThreshold": "Low Stock Threshold",
@@ -185,7 +186,7 @@
     "editFormDescription": "Product Description",
     "editFormThickness": "Thickness (mm)",
     "editFormWidth": "Width (mm)",
-    "editFormLength": "Length (mm)",
+    "editFormLength": "Length (m)",
     "editFormPrice": "Price (Baht)",
     "editFormStockQuantity": "Stock Quantity",
     "editFormLowStockThreshold": "Low Stock Threshold",
@@ -606,5 +607,32 @@
     "loading": "Loading...",
     "pleaseFillAllFields": "Please fill in all required fields.",
     "invalidData": "Invalid data."
+  },
+  "POS": {
+    "title": "Point of Sale",
+    "searchPlaceholder": "Search products or scan barcode...",
+    "scan": "Scan",
+    "scanTitle": "Barcode Scanner",
+    "scanDescription": "Point your camera at a barcode or QR code",
+    "noProducts": "No products found",
+    "itemCount": "{count} items in cart",
+    "selectCustomer": "Select customer (optional)",
+    "selectWarehouse": "Select warehouse *",
+    "emptyCart": "Cart is empty",
+    "total": "Total",
+    "checkout": "Checkout",
+    "warehouseRequired": "Please select a warehouse before checkout",
+    "payment": "Payment",
+    "method_cash": "Cash",
+    "method_transfer": "Transfer",
+    "method_qrcode": "QR Code",
+    "cashReceived": "Cash received",
+    "change": "Change",
+    "uploadSlip": "Upload transfer slip",
+    "tapToUpload": "Tap to upload slip image",
+    "uploading": "Uploading...",
+    "slipRequired": "Please upload a payment slip",
+    "processing": "Processing...",
+    "confirmSale": "Confirm Sale"
   }
 }

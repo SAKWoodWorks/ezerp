@@ -14,7 +14,8 @@
     "accounting": "บัญชี",
     "reports": "รายงาน",
     "settings": "ตั้งค่า",
-    "logout": "ออกจากระบบ"
+    "logout": "ออกจากระบบ",
+    "pos": "POS"
   },
   "SidebarSections": {
     "main": "เมนูหลัก",
@@ -143,7 +144,7 @@
     "addNewItemDescLabel": "คำอธิบายสินค้า",
     "thickness": "ความหนา (มม.)",
     "width": "ความกว้าง (มม.)",
-    "length": "ความยาว (มม.)",
+    "length": "ความยาว (ม.)",
     "addNewItemPriceLabel": "ราคา (บาท)",
     "stockQuantity": "จำนวนในสต็อก",
     "lowStockThreshold": "จุดสั่งซื้อขั้นต่ำ",
@@ -186,7 +187,7 @@
     "editFormDescription": "คําอธิบายสินค้า",
     "editFormThickness": "ความหนา (มม.)",
     "editFormWidth": "ความกว้าง (มม.)",
-    "editFormLength": "ความยาว (มม.)",
+    "editFormLength": "ความยาว (ม.)",
     "editFormPrice": "ราคา (บาท)",
     "editFormStockQuantity": "จํานวนในสต็อก",
     "editFormLowStockThreshold": "จุดสั่งซื้อขั้นต่ำ",
@@ -321,6 +322,7 @@
     "customerLabel": "ลูกค้า",
     "customerPlaceholder": "-- เลือกลูกค้า --",
     "responsiblePersonLabel": "ผู้รับผิดชอบ",
+    "responsiblePerson": "ผู้รับผิดชอบ:",
     "responsiblePersonSearchPlaceholder": "ค้นหาผู้รับผิดชอบ...",
     "responsiblePersonPlaceholder": "-- เลือกผู้รับผิดชอบ --",
     "editFormQuotationNumber": "เลขที่ใบเสนอราคา",
@@ -606,5 +608,32 @@
     "loading": "กำลังโหลด...",
     "pleaseFillAllFields": "กรุณากรอกข้อมูลให้ครบถ้วน",
     "invalidData": "ข้อมูลไม่ถูกต้อง"
+  },
+  "POS": {
+    "title": "จุดขาย (POS)",
+    "searchPlaceholder": "ค้นหาสินค้า หรือสแกนบาร์โค้ด...",
+    "scan": "สแกน",
+    "scanTitle": "สแกนบาร์โค้ด",
+    "scanDescription": "ชี้กล้องไปที่บาร์โค้ดหรือ QR Code",
+    "noProducts": "ไม่พบสินค้า",
+    "itemCount": "{count} รายการในตะกร้า",
+    "selectCustomer": "เลือกลูกค้า (ถ้ามี)",
+    "selectWarehouse": "เลือกคลังสินค้า *",
+    "emptyCart": "ยังไม่มีสินค้าในตะกร้า",
+    "total": "รวมทั้งสิ้น",
+    "checkout": "ชำระเงิน",
+    "warehouseRequired": "กรุณาเลือกคลังสินค้าก่อนชำระเงิน",
+    "payment": "ชำระเงิน",
+    "method_cash": "เงินสด",
+    "method_transfer": "โอนเงิน",
+    "method_qrcode": "QR Code",
+    "cashReceived": "รับเงินมา",
+    "change": "เงินทอน",
+    "uploadSlip": "อัพโหลดสลิปการโอน",
+    "tapToUpload": "แตะเพื่ออัพโหลดรูปสลิป",
+    "uploading": "กำลังอัพโหลด...",
+    "slipRequired": "กรุณาอัพโหลดสลิปการชำระเงิน",
+    "processing": "กำลังบันทึก...",
+    "confirmSale": "ยืนยันการขาย"
   }
 }
