@@ -1,6 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from "vitest"
 import { importCustomers } from "./actions"
 
+/**
+ * CSV Import Tests - Test-Driven Development (TDD)
+ *
+ * These tests are intentionally written to fail until CSV parsing is implemented.
+ * This follows TDD methodology:
+ * 1. Write failing tests first (Task 1) ✓
+ * 2. Implement code to make tests pass (Task 2)
+ * 3. Refactor and improve (Task 3+)
+ *
+ * Tests will pass once CSV detection and column mapping is implemented.
+ */
+
 // These tests expect CSV-specific column mapping (customer_name -> name, customer_branch -> responsible_person)
 // Current implementation lacks CSV detection and proper column mapping
 // Tests will fail because CSV columns aren't mapped to database schema correctly
