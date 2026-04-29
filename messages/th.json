@@ -15,7 +15,8 @@
     "reports": "รายงาน",
     "settings": "ตั้งค่า",
     "logout": "ออกจากระบบ",
-    "pos": "POS"
+    "pos": "POS",
+    "stockByGrade": "สต็อกตามเกรด"
   },
   "SidebarSections": {
     "main": "เมนูหลัก",
@@ -608,6 +609,19 @@
     "loading": "กำลังโหลด...",
     "pleaseFillAllFields": "กรุณากรอกข้อมูลให้ครบถ้วน",
     "invalidData": "ข้อมูลไม่ถูกต้อง"
+  },
+  "StockByGrade": {
+    "title": "สต็อกตามเกรด (จาก Google Sheets)",
+    "lastSync": "ซิงค์ล่าสุด",
+    "product": "สินค้า",
+    "code": "CODE",
+    "warehouse": "คลังสินค้า",
+    "gradeA": "เกรด A",
+    "ccaReady": "CCA-Ready",
+    "gradeCCA": "เกรด CCA",
+    "gradeB": "เกรด B",
+    "total": "รวม",
+    "noData": "ยังไม่มีข้อมูลจาก Google Sheets"
   },
   "POS": {
     "title": "จุดขาย (POS)",

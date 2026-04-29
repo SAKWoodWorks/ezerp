@@ -15,7 +15,8 @@
     "reports": "Отчеты",
     "settings": "Настройки",
     "logout": "Выйти",
-    "pos": "POS"
+    "pos": "POS",
+    "stockByGrade": "Сток по грейдам"
   },
   "SidebarSections": {
     "main": "Основное меню",
@@ -607,6 +608,19 @@
     "loading": "Загрузка...",
     "pleaseFillAllFields": "Пожалуйста, заполните все обязательные поля.",
     "invalidData": "Неверные данные."
+  },
+  "StockByGrade": {
+    "title": "Сток по грейдам (из Google Sheets)",
+    "lastSync": "Последняя синхронизация",
+    "product": "Товар",
+    "code": "КОД",
+    "warehouse": "Склад",
+    "gradeA": "Грейд A",
+    "ccaReady": "CCA-Ready",
+    "gradeCCA": "Грейд CCA",
+    "gradeB": "Грейд B",
+    "total": "Итого",
+    "noData": "Данные из Google Sheets ещё не синхронизированы"
   },
   "POS": {
     "title": "Касса",
