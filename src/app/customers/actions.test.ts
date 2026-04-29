@@ -65,10 +65,10 @@ test-id-2,Another Company,987654321,456 Another St,555-5678,Phuket Branch,2026-0
 
     const result = await importCustomers(base64Data)
 
-    // Currently fails because CSV columns (customer_name) don't map to database schema (name)
-    // TODO: Will pass once CSV column mapping is implemented in Task 2
-    expect(result.error).toBeDefined()
-    expect(result.error).toContain("Failed to import customers")
+    // CSV parsing now works with proper column mapping!
+    expect(result.error).toBeUndefined()
+    expect(result.success).toBe(true)
+    expect(result.count).toBe(2)
   })
 
   it("should handle CSV with missing optional fields", async () => {
@@ -80,10 +80,10 @@ test-id,Test Company,,123 Test St,,,2026-04-29T00:00:00Z`
 
     const result = await importCustomers(base64Data)
 
-    // Currently fails because CSV columns (customer_name) don't map to database schema (name)
-    // TODO: Will pass once CSV column mapping is implemented in Task 2
-    expect(result.error).toBeDefined()
-    expect(result.error).toContain("Failed to import customers")
+    // CSV parsing now works with proper column mapping! Missing optional fields should be handled gracefully
+    expect(result.error).toBeUndefined()
+    expect(result.success).toBe(true)
+    expect(result.count).toBe(1)
   })
 
   it("should reject CSV with missing required fields", async () => {
@@ -95,10 +95,8 @@ test-id,,123456789,123 Test St,555-1234,Bangkok Branch,2026-04-29T00:00:00Z`
 
     const result = await importCustomers(base64Data)
 
-    // Currently fails because CSV columns (customer_name) don't map to database schema (name)
-    // Even with empty customer_name, the issue is column mapping, not validation
-    // TODO: Once CSV mapping is implemented, this should properly validate required fields
+    // CSV parsing now properly validates required fields and provides clear error messages
     expect(result.error).toBeDefined()
-    expect(result.error).toContain("Failed to import customers")
+    expect(result.error).toContain("missing required field: name")
   })
 })

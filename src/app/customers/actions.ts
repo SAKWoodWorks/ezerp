@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
-import * as XLSX from "xlsx" // 1. Import xlsx library
+import * as XLSX from "@e965/xlsx"
 
 // ฟังก์ชันสำหรับเพิ่มลูกค้าใหม่
 export async function addCustomer(formData: FormData) {
@@ -121,35 +121,46 @@ export async function importCustomers(fileBase64: string) {
     // Decode the base64 string to a buffer
     const buffer = Buffer.from(fileBase64, "base64")
 
-    // Read the workbook from the buffer
-    const workbook = XLSX.read(buffer, { type: "buffer" })
-    const sheetName = workbook.SheetNames[0]
-    const worksheet = workbook.Sheets[sheetName]
+    let data: CustomerData[]
 
-    // Convert sheet to JSON. Assumes first row is headers.
-    // Headers should be: name, tax_id, phone, line_id, address
-    const data: CustomerData[] = XLSX.utils.sheet_to_json(worksheet)
+    if (isCSVData(buffer)) {
+      // Parse as CSV
+      data = parseCSVData(buffer)
+    } else {
+      // Parse as Excel (existing logic)
+      const workbook = XLSX.read(buffer, { type: "buffer" })
+      const sheetName = workbook.SheetNames[0]
+      const worksheet = workbook.Sheets[sheetName]
+      data = XLSX.utils.sheet_to_json(worksheet)
+
+      // Map Excel data (existing mapping)
+      data = data.map((row: any) => ({
+        name: row.name,
+        tax_id: row.tax_id || null,
+        phone: row.phone ? String(row.phone) : null,
+        line_id: row.line_id || null,
+        address: row.address || null,
+      }))
+    }
 
     if (data.length === 0) {
       return { error: "File is empty or has incorrect format." }
     }
 
-    // Map JSON data to the format expected by Supabase
+    // Map to insertion format
     const customersToInsert = data.map((row) => ({
       name: row.name,
       tax_id: row.tax_id || null,
-      phone: row.phone ? String(row.phone) : null,
+      phone: row.phone || null,
       line_id: row.line_id || null,
       address: row.address || null,
-      // You might want to set a default responsible person or leave it null
-      // responsible_person_id: 1
+      responsible_person: row.responsible_person || null,
     }))
 
     // Insert data into the database
     const { error, count } = await supabase
       .from("customers")
       .insert(customersToInsert)
-    //.select("*", { count: "exact" })
 
     if (error) {
       console.error("Error inserting customers:", error)
@@ -160,6 +171,51 @@ export async function importCustomers(fileBase64: string) {
     return { success: true, count: count ?? 0 }
   } catch (e) {
     console.error("Error processing file:", e)
-    return { error: "Invalid file format or data." }
+    return { error: e instanceof Error ? e.message : "Invalid file format or data." }
   }
+}
+
+// Helper function to detect if data is CSV
+function isCSVData(buffer: Buffer): boolean {
+  const str = buffer.toString('utf8', 0, Math.min(1024, buffer.length))
+  // Simple heuristic: contains commas and has customer_name header
+  return str.includes(',') && str.includes('customer_name')
+}
+
+// Helper function to parse CSV data
+function parseCSVData(buffer: Buffer): CustomerData[] {
+  const csvText = buffer.toString('utf8')
+  const lines = csvText.trim().split('\n')
+
+  if (lines.length < 2) {
+    throw new Error('CSV file must have at least a header row and one data row')
+  }
+
+  const headers = lines[0].split(',').map(h => h.trim())
+  const dataLines = lines.slice(1)
+
+  return dataLines.map((line, index) => {
+    const values = line.split(',').map(v => v.trim())
+    const row: Record<string, string> = {}
+
+    headers.forEach((header, i) => {
+      row[header] = values[i] || ''
+    })
+
+    // Map CSV columns to our schema
+    const mapped: CustomerData = {
+      name: row.customer_name || '',
+      tax_id: row.customer_tax_id || '',
+      address: row.customer_address || '',
+      phone: row.customer_phone || '',
+      line_id: '', // Not available in CSV
+      responsible_person: row.customer_branch || '',
+    }
+
+    if (!mapped.name) {
+      throw new Error(`Row ${index + 2}: missing required field: name`)
+    }
+
+    return mapped
+  })
 }
