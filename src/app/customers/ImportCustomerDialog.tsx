@@ -84,7 +84,7 @@ export default function ImportCustomerDialog() {
               id="customer-file"
               type="file"
               onChange={handleFileChange}
-              accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+              accept=".xlsx,.xls,.csv"
             />
           </div>
         </div>

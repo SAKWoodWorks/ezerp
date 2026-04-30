@@ -95,7 +95,7 @@
     "buttonTitle": "เพิ่มลูกค้า",
     "importDialog": {
       "title": "นําเข้าข้อมูลลูกค้า",
-      "description": "โปรดเลือกไฟล์ CSV ที่ต้องการนําเข้า",
+      "description": "อัปโหลดไฟล์ Excel (.xlsx, .xls) หรือ CSV ที่มีข้อมูลลูกค้า คอลัมน์ที่จำเป็น: name คอลัมน์เสริม: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "นําเข้า",
       "importSuccess": "นําเข้าข้อมูลลูกค้าเรียบร้อยแล้ว",
       "records": "รายการ",

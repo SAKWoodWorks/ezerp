@@ -95,7 +95,7 @@
     "buttonTitle": "Добавить клиента",
     "importDialog": {
       "title": "Наложить данные клиентов",
-      "description": "Выберите CSV файл для импорта",
+      "description": "Загрузите файл Excel (.xlsx, .xls) или CSV с данными клиентов. Обязательный столбец: name. Дополнительные столбцы: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "Наложить",
       "importSuccess": "Наложение данных клиентов завершено",
       "records": "Записей",

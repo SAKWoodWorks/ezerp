@@ -94,7 +94,7 @@
     "buttonTitle": "Add Customer",
     "importDialog": {
       "title": "Import Customers",
-      "description": "Select a CSV file to import",
+      "description": "Upload an Excel (.xlsx, .xls) or CSV file with customer data. Required column: name. Optional columns: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "Import",
       "importSuccess": "Imported customers successfully",
       "records": "Records",
