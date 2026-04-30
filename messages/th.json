@@ -102,6 +102,14 @@
       "instructions": "วิธีการนําเข้า",
       "selectFile": "เลือกไฟล์",
       "importButton": "นําเข้า"
+    },
+    "pagination": {
+      "showing": "แสดง {start}-{end} จาก {total} ลูกค้า",
+      "previous": "ก่อนหน้า",
+      "next": "ถัดไป",
+      "show": "แสดง",
+      "page": "หน้า {number}",
+      "goToPage": "ไปหน้า {number}"
     }
   },
   "CustomerDetailPage": {

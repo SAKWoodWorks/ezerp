@@ -101,6 +101,14 @@
       "instructions": "Instructions",
       "selectFile": "Select File",
       "importButton": "Import"
+    },
+    "pagination": {
+      "showing": "Showing {start}-{end} of {total} customers",
+      "previous": "Previous",
+      "next": "Next",
+      "show": "Show",
+      "page": "Page {number}",
+      "goToPage": "Go to page {number}"
     }
   },
   "CustomerDetailPage": {
