@@ -175,11 +175,54 @@ export async function importCustomers(fileBase64: string) {
   }
 }
 
+// Helper function to parse CSV line properly handling quoted fields
+function parseCSVLine(line: string): string[] {
+  const result: string[] = []
+  let current = ''
+  let inQuotes = false
+  let i = 0
+
+  while (i < line.length) {
+    const char = line[i]
+
+    if (char === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        // Handle escaped quotes ""
+        current += '"'
+        i += 2
+      } else {
+        // Toggle quote state
+        inQuotes = !inQuotes
+        i++
+      }
+    } else if (char === ',' && !inQuotes) {
+      // Field separator outside quotes
+      result.push(current.trim())
+      current = ''
+      i++
+    } else {
+      current += char
+      i++
+    }
+  }
+
+  result.push(current.trim())
+  return result
+}
+
 // Helper function to detect if data is CSV
 function isCSVData(buffer: Buffer): boolean {
-  const str = buffer.toString('utf8', 0, Math.min(1024, buffer.length))
-  // Simple heuristic: contains commas and has customer_name header
-  return str.includes(',') && str.includes('customer_name')
+  const str = buffer.toString('utf8', 0, Math.min(2048, buffer.length))
+  const lines = str.split('\n')
+
+  if (lines.length < 1) return false
+
+  const firstLine = lines[0]
+  // Check for CSV characteristics: commas and customer_name header
+  return firstLine.includes(',') &&
+         firstLine.includes('customer_name') &&
+         !firstLine.includes('<?xml') && // Not XML (Excel)
+         !str.includes('PK') // Not ZIP-based format (Excel)
 }
 
 // Helper function to parse CSV data
@@ -191,11 +234,11 @@ function parseCSVData(buffer: Buffer): CustomerData[] {
     throw new Error('CSV file must have at least a header row and one data row')
   }
 
-  const headers = lines[0].split(',').map(h => h.trim())
+  const headers = parseCSVLine(lines[0])
   const dataLines = lines.slice(1)
 
   return dataLines.map((line, index) => {
-    const values = line.split(',').map(v => v.trim())
+    const values = parseCSVLine(line)
     const row: Record<string, string> = {}
 
     headers.forEach((header, i) => {
