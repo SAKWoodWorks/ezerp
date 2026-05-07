@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import {
-  SyncIcon,
+  Sync,
   TrendingUp,
   Users,
   Package,
@@ -205,7 +205,7 @@ export default async function GoogleSheetsSyncPage(props: Props) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <SyncIcon className="w-5 h-5" />
+              <Sync className="w-5 h-5" />
               Sales Data Comparison
             </CardTitle>
             <CardDescription>

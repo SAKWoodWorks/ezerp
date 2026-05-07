@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl"
 import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { BarcodeScanner } from "@/components/barcode/BarcodeScanner"
+import BarcodeScanner from "@/components/barcode/BarcodeScanner"
 import type { Product } from "./POSTerminal"
 
 interface ProductSearchProps {
