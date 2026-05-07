@@ -10,6 +10,7 @@ import {
   Users,
   FileText,
   BarChart2,
+  TableProperties,
   LogOut,
   Package,
   UserCheck,
@@ -107,6 +108,7 @@ export default function Sidebar() {
       items: [
         { href: "/", label: t("dashboard"), icon: LayoutDashboard },
         { href: "/reports", label: t("reports"), icon: BarChart2 },
+        { href: "/reports/stock-by-grade", label: t("stockByGrade"), icon: TableProperties },
       ],
     },
     {

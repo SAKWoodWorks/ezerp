@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  # Next.js application container
+  nextjs-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: erp-nextjs-app
+    restart: unless-stopped
+    env_file:
+      - .env.local
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+    expose:
+      - "3000"
+    networks:
+      - erp-network
+
+  # Nginx reverse proxy container
+  nginx:
+    image: nginx:alpine
+    container_name: erp-nginx
+    restart: unless-stopped
+    ports:
+      - "8002:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - erp-network
+    depends_on:
+      - nextjs-app
+
+# Custom network for container communication
+networks:
+  erp-network:
+    driver: bridge

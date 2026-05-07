@@ -12,6 +12,13 @@ export async function addProduct(formData: FormData) {
   } = await supabase.auth.getUser()
   if (!user) return redirect("/login")
 
+  // --- เพิ่มการดึงข้อมูล E-commerce จาก formData ---
+  const isEcommerceProduct = formData.get("is_ecommerce_product") === "true"
+  const ecommerceSizesString = formData.get("ecommerce_sizes") as string
+  const ecommerceSizes = isEcommerceProduct
+    ? JSON.parse(ecommerceSizesString)
+    : null
+
   const productData = {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
@@ -22,6 +29,9 @@ export async function addProduct(formData: FormData) {
     width: Number(formData.get("width")),
     length: Number(formData.get("length")),
     thickness: Number(formData.get("thickness")),
+    // เพิ่มข้อมูล E-commerce ลงใน object ที่จะบันทึก
+    is_ecommerce_product: isEcommerceProduct,
+    ecommerce_sizes: ecommerceSizes,
   }
 
   const { error } = await supabase.from("products").insert(productData)
@@ -45,18 +55,29 @@ export async function updateProduct(productId: number, formData: FormData) {
     return redirect("/login")
   }
 
+  // --- เพิ่มการดึงข้อมูล E-commerce จาก formData ---
+  const isEcommerceProduct = formData.get("is_ecommerce_product") === "true"
+  const ecommerceSizesString = formData.get("ecommerce_sizes") as string
+  // แปลงข้อมูลขนาดจาก String (JSON) กลับมาเป็น Array ของตัวเลข
+  // ถ้าไม่ได้ติ๊กขาย E-commerce ให้ค่าเป็น null
+  const ecommerceSizes = isEcommerceProduct
+    ? JSON.parse(ecommerceSizesString)
+    : null
+
   const productData = {
     name: formData.get("name") as string,
     description: formData.get("description") as string,
     price: Number(formData.get("price")),
-    stock_quantity: Number(formData.get("stock_quantity")),
     low_stock_threshold: Number(formData.get("low_stock_threshold")),
-    // Add new dimension fields
     width: Number(formData.get("width")),
     length: Number(formData.get("length")),
     thickness: Number(formData.get("thickness")),
+    // เพิ่มข้อมูล E-commerce ลงใน object ที่จะอัปเดต
+    is_ecommerce_product: isEcommerceProduct,
+    ecommerce_sizes: ecommerceSizes,
   }
 
+  // ทำการอัปเดตข้อมูลในฐานข้อมูล
   const { error } = await supabase
     .from("products")
     .update(productData)
@@ -67,9 +88,10 @@ export async function updateProduct(productId: number, formData: FormData) {
     return redirect(`/products/${productId}?message=Error updating product`)
   }
 
+  // ล้าง Cache ของหน้าเว็บที่เกี่ยวข้องเพื่อให้แสดงผลข้อมูลล่าสุด
   await revalidatePath(`/products`)
   await revalidatePath(`/products/${productId}`)
-  redirect(`/products`)
+  redirect(`/products/${productId}`) // Redirect กลับไปหน้ารายละเอียดสินค้า
 }
 
 // ฟังก์ชันสำหรับลบข้อมูลสินค้า

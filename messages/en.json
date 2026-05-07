@@ -14,7 +14,8 @@
     "reports": "Reports",
     "settings": "Settings",
     "logout": "Logout",
-    "pos": "POS"
+    "pos": "POS",
+    "stockByGrade": "Stock by Grade"
   },
   "SidebarSections": {
     "main": "Main Menu",
@@ -93,13 +94,21 @@
     "buttonTitle": "Add Customer",
     "importDialog": {
       "title": "Import Customers",
-      "description": "Select a CSV file to import",
+      "description": "Upload an Excel (.xlsx, .xls) or CSV file with customer data. Required column: name. Optional columns: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "Import",
       "importSuccess": "Imported customers successfully",
       "records": "Records",
       "instructions": "Instructions",
       "selectFile": "Select File",
       "importButton": "Import"
+    },
+    "pagination": {
+      "showing": "Showing {start}-{end} of {total} customers",
+      "previous": "Previous",
+      "next": "Next",
+      "show": "Show",
+      "page": "Page {number}",
+      "goToPage": "Go to page {number}"
     }
   },
   "CustomerDetailPage": {
@@ -607,6 +616,19 @@
     "loading": "Loading...",
     "pleaseFillAllFields": "Please fill in all required fields.",
     "invalidData": "Invalid data."
+  },
+  "StockByGrade": {
+    "title": "Stock by Grade (from Google Sheets)",
+    "lastSync": "Last synced",
+    "product": "Product",
+    "code": "CODE",
+    "warehouse": "Warehouse",
+    "gradeA": "Grade A",
+    "ccaReady": "CCA-Ready",
+    "gradeCCA": "Grade CCA",
+    "gradeB": "Grade B",
+    "total": "Total",
+    "noData": "No data synced from Google Sheets yet"
   },
   "POS": {
     "title": "Point of Sale",

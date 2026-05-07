@@ -38,9 +38,15 @@ type Customer = {
 
 interface Props {
   initialCustomers: Customer[]
+  pagination?: {
+    currentPage: number
+    pageSize: number
+    totalCount: number
+    totalPages: number
+  }
 }
 
-export default function CustomerClientPage({ initialCustomers }: Props) {
+export default function CustomerClientPage({ initialCustomers, pagination }: Props) {
   const t = useTranslations("CustomersPage")
   const [customers, setCustomers] = useState(initialCustomers)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
