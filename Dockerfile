@@ -6,7 +6,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 # Clean install dependencies
 RUN rm -rf node_modules package-lock.json
-RUN npm install
+RUN npm install --legacy-peer-deps
 
 # Stage 2: Build แอปพลิเคชัน
 FROM node:18-alpine AS builder
