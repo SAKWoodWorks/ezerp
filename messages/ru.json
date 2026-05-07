@@ -15,7 +15,8 @@
     "reports": "Отчеты",
     "settings": "Настройки",
     "logout": "Выйти",
-    "pos": "POS"
+    "pos": "POS",
+    "stockByGrade": "Сток по грейдам"
   },
   "SidebarSections": {
     "main": "Основное меню",
@@ -94,13 +95,21 @@
     "buttonTitle": "Добавить клиента",
     "importDialog": {
       "title": "Наложить данные клиентов",
-      "description": "Выберите CSV файл для импорта",
+      "description": "Загрузите файл Excel (.xlsx, .xls) или CSV с данными клиентов. Обязательный столбец: name. Дополнительные столбцы: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "Наложить",
       "importSuccess": "Наложение данных клиентов завершено",
       "records": "Записей",
       "instructions": "Инструкции",
       "selectFile": "Выбрать файл",
       "importButton": "Наложить"
+    },
+    "pagination": {
+      "showing": "Показано {start}-{end} из {total} клиентов",
+      "previous": "Предыдущая",
+      "next": "Следующая",
+      "show": "Показать",
+      "page": "Страница {number}",
+      "goToPage": "Перейти на страницу {number}"
     }
   },
   "CustomerDetailPage": {
@@ -607,6 +616,19 @@
     "loading": "Загрузка...",
     "pleaseFillAllFields": "Пожалуйста, заполните все обязательные поля.",
     "invalidData": "Неверные данные."
+  },
+  "StockByGrade": {
+    "title": "Сток по грейдам (из Google Sheets)",
+    "lastSync": "Последняя синхронизация",
+    "product": "Товар",
+    "code": "КОД",
+    "warehouse": "Склад",
+    "gradeA": "Грейд A",
+    "ccaReady": "CCA-Ready",
+    "gradeCCA": "Грейд CCA",
+    "gradeB": "Грейд B",
+    "total": "Итого",
+    "noData": "Данные из Google Sheets ещё не синхронизированы"
   },
   "POS": {
     "title": "Касса",

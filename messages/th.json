@@ -15,7 +15,8 @@
     "reports": "รายงาน",
     "settings": "ตั้งค่า",
     "logout": "ออกจากระบบ",
-    "pos": "POS"
+    "pos": "POS",
+    "stockByGrade": "สต็อกตามเกรด"
   },
   "SidebarSections": {
     "main": "เมนูหลัก",
@@ -94,13 +95,21 @@
     "buttonTitle": "เพิ่มลูกค้า",
     "importDialog": {
       "title": "นําเข้าข้อมูลลูกค้า",
-      "description": "โปรดเลือกไฟล์ CSV ที่ต้องการนําเข้า",
+      "description": "อัปโหลดไฟล์ Excel (.xlsx, .xls) หรือ CSV ที่มีข้อมูลลูกค้า คอลัมน์ที่จำเป็น: name คอลัมน์เสริม: tax_id, phone, line_id, address, responsible_person",
       "buttonTitle": "นําเข้า",
       "importSuccess": "นําเข้าข้อมูลลูกค้าเรียบร้อยแล้ว",
       "records": "รายการ",
       "instructions": "วิธีการนําเข้า",
       "selectFile": "เลือกไฟล์",
       "importButton": "นําเข้า"
+    },
+    "pagination": {
+      "showing": "แสดง {start}-{end} จาก {total} ลูกค้า",
+      "previous": "ก่อนหน้า",
+      "next": "ถัดไป",
+      "show": "แสดง",
+      "page": "หน้า {number}",
+      "goToPage": "ไปหน้า {number}"
     }
   },
   "CustomerDetailPage": {
@@ -608,6 +617,19 @@
     "loading": "กำลังโหลด...",
     "pleaseFillAllFields": "กรุณากรอกข้อมูลให้ครบถ้วน",
     "invalidData": "ข้อมูลไม่ถูกต้อง"
+  },
+  "StockByGrade": {
+    "title": "สต็อกตามเกรด (จาก Google Sheets)",
+    "lastSync": "ซิงค์ล่าสุด",
+    "product": "สินค้า",
+    "code": "CODE",
+    "warehouse": "คลังสินค้า",
+    "gradeA": "เกรด A",
+    "ccaReady": "CCA-Ready",
+    "gradeCCA": "เกรด CCA",
+    "gradeB": "เกรด B",
+    "total": "รวม",
+    "noData": "ยังไม่มีข้อมูลจาก Google Sheets"
   },
   "POS": {
     "title": "จุดขาย (POS)",

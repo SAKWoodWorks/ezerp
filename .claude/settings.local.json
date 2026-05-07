@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(powershell:*)",
+      "Bash(npm test:*)",
+      "Bash(pwsh:*)",
+      "Bash(npm.cmd test)",
+      "Bash(npx vitest run:*)",
+      "Bash(node:*)",
+      "Bash(npm update *)",
+      "Bash(npm audit *)",
+      "Bash(npm install *)",
+      "Bash(npm ls *)",
+      "Bash(npm run *)",
+      "Bash(npm view *)",
+      "Bash(cat .eslintrc.json)",
+      "Bash(cat .eslintrc.js)",
+      "Bash(cat .eslintrc)",
+      "Bash(cat eslint.config.mjs)",
+      "Bash(cat eslint.config.js)",
+      "Bash(grep -v \"^$\")",
+      "Bash(xargs ls *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git config *)",
+      "Bash(npx tsc *)",
+      "Bash(git push *)",
+      "Bash(git remote *)",
+      "Read(//d/Works/Web/crm/ProjectCRM/next-crm/**)",
+      "Bash(sqlite3 :memory: \"SELECT * FROM sqlite_master WHERE type='table' AND name='product_inventories'\")"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

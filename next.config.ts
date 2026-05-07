@@ -6,6 +6,7 @@ const createNextIntlPlugin = require("next-intl/plugin")
 const nextConfig: NextConfig = {
   /* config options here */
   output: "standalone",
+  outputFileTracingRoot: __dirname,
   images: {
     // เพิ่มส่วนนี้เพื่ออนุญาต Hostname ของ Supabase Storage
     remotePatterns: [

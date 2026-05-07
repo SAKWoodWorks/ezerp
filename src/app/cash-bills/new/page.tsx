@@ -11,9 +11,12 @@ export default async function NewCashBillPage() {
     await Promise.all([
       supabase.from("customers").select("id, name"),
       supabase.from("responsible_persons").select("id, name"),
+      // ดึงข้อมูลสินค้าทั้งหมด รวมถึงข้อมูลสำหรับ E-commerce
       supabase
         .from("products")
-        .select("id, name, price, description, width, length, thickness"),
+        .select(
+          "id, name, price, description, width, length, thickness, is_ecommerce_product, ecommerce_sizes"
+        ),
       supabase.from("warehouses").select("id, name"), // Fetch warehouses
     ])
 
