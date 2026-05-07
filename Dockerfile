@@ -2,12 +2,16 @@
 FROM node:18-slim AS deps
 WORKDIR /app
 
-# Install system dependencies for native bindings
+# Install system dependencies for native bindings including Rust
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
+    curl \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 COPY package.json package-lock.json* ./
 RUN rm -rf node_modules package-lock.json
@@ -17,12 +21,16 @@ RUN npm install --legacy-peer-deps
 FROM node:18-slim AS builder
 WORKDIR /app
 
-# Install system dependencies for build
+# Install system dependencies for build including Rust
 RUN apt-get update && apt-get install -y \
     python3 \
     make \
     g++ \
+    curl \
+    && curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y \
     && rm -rf /var/lib/apt/lists/*
+
+ENV PATH="/root/.cargo/bin:${PATH}"
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
