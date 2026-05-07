@@ -4,7 +4,8 @@ FROM node:18-alpine AS deps
 WORKDIR /app
 # Copy package.json and the lock file
 COPY package.json package-lock.json* ./
-# Use a more robust npm install command
+# Clean install dependencies
+RUN rm -rf node_modules package-lock.json
 RUN npm install
 
 # Stage 2: Build แอปพลิเคชัน
