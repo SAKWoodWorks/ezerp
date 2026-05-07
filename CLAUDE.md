@@ -538,6 +538,23 @@ Uses multi-stage build with `output: "standalone"` in `next.config.ts`.
   - Updates Dockerfile with dependency fixes
 
 **Common Build Issues:**
-- Tailwind CSS native binding errors with Alpine Linux (fixed with `--legacy-peer-deps`)
-- Missing BarcodeScanner component (auto-created by deployment scripts)
-- Import syntax errors (use default imports for custom components)
+
+**Tailwind CSS v4 Native Binding Errors:**
+- **Problem**: `Cannot find native binding` error with `@tailwindcss/oxide`
+- **Root cause**: Tailwind CSS v4 uses Rust-based native modules that need compilation
+- **Solution**: Dockerfile uses `node:18-slim` (not Alpine) + Rust toolchain + system dependencies
+- **Dependencies needed**: `python3`, `make`, `g++`, `curl`, and Rust via rustup
+
+**Import Syntax Issues:**
+- **BarcodeScanner**: Use default import `import BarcodeScanner from '@/components/barcode/BarcodeScanner'`
+- **lucide-react icons**: No "Icon" suffix (use `Search` not `SearchIcon`, `RefreshCw` not `Sync`)
+- **Missing components**: Auto-created by deployment scripts, but check props interface matches usage
+
+**Docker Build Troubleshooting:**
+```bash
+# If build fails, clean everything and rebuild
+docker-compose down
+docker system prune -f
+docker-compose build --no-cache
+docker-compose up -d
+```
