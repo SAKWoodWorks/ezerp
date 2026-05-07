@@ -407,6 +407,7 @@ const mockSupabaseClient = {
 - **RPC in mocks**: Include `rpc: vi.fn()` at the client level, not inside `from()`
 - **Vitest version**: Locked at v3.2.3 — do NOT upgrade to v4 (rolldown ESM compat breaks with Node.js)
 - **`@vitejs/plugin-react`**: Locked at v4.3.4 for same reason
+- **Import Syntax Issues**: BarcodeScanner component uses default export; lucide-react icons don't have "Icon" suffix (use `Search` not `SearchIcon`)
 
 ## Module Organization
 
@@ -485,9 +486,58 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
 ## Docker Deployment
 
+### Local Development
+
 ```bash
 docker build -t next-crm .
 docker run -p 3000:3000 next-crm
 ```
 
+### Production with Docker Compose (Nginx + App)
+
+The application includes Docker Compose configuration for production deployment with Nginx reverse proxy:
+
+```bash
+# Build and start services
+docker-compose build --no-cache
+docker-compose up -d
+
+# Check status
+docker-compose ps
+
+# View logs
+docker-compose logs -f
+
+# Stop services
+docker-compose down
+```
+
+**Configuration:**
+- **App Container**: Next.js app on port 3000 (internal)
+- **Nginx Container**: Reverse proxy on port 8002 (external)
+- **Network**: Custom bridge network for container communication
+
+**Files:**
+- `docker-compose.yml` - Main production configuration
+- `nginx.conf` - Nginx reverse proxy configuration  
+- `deploy.sh` - Automated deployment script for servers
+- `.env.local` - Required environment variables
+
 Uses multi-stage build with `output: "standalone"` in `next.config.ts`.
+
+### Deployment Scripts
+
+- **`deploy.sh`** - One-click deployment script for Digital Ocean servers
+  - Handles missing components, Docker cleanup, and build process
+  - Checks for `.env.local` file and creates missing directories
+  - Includes health checks and firewall configuration
+
+- **`fix-build.sh`** - Fixes common Docker build issues
+  - Removes obsolete version from docker-compose.yml
+  - Creates missing BarcodeScanner component
+  - Updates Dockerfile with dependency fixes
+
+**Common Build Issues:**
+- Tailwind CSS native binding errors with Alpine Linux (fixed with `--legacy-peer-deps`)
+- Missing BarcodeScanner component (auto-created by deployment scripts)
+- Import syntax errors (use default imports for custom components)
