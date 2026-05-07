@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 import {
-  Sync,
+  RefreshCw,
   TrendingUp,
   Users,
   Package,
@@ -63,10 +63,10 @@ type Props = {
   searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }
 
-export default async function GoogleSheetsSyncPage(props: Props) {
+export default async function GoogleSheetsRefreshCwPage(props: Props) {
   const searchParams = await props.searchParams
   const supabase = await createClient()
-  const t = await getTranslations("GoogleSheetsSync")
+  const t = await getTranslations("GoogleSheetsRefreshCw")
 
   // Get current date range (default to current month)
   const currentDate = new Date()
@@ -105,25 +105,25 @@ export default async function GoogleSheetsSyncPage(props: Props) {
   const externalTopProducts = externalTopProductsRes.data || []
 
   // Calculate sync freshness
-  const lastSyncTime = externalSales[0]?.synced_at
-  const syncFreshness = lastSyncTime ?
-    Math.round((Date.now() - new Date(lastSyncTime).getTime()) / (1000 * 60)) : null
+  const lastRefreshCwTime = externalSales[0]?.synced_at
+  const syncFreshness = lastRefreshCwTime ?
+    Math.round((Date.now() - new Date(lastRefreshCwTime).getTime()) / (1000 * 60)) : null
 
   return (
     <div className="p-8 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">{t("title") || "Google Sheets Sync"}</h1>
+          <h1 className="text-3xl font-bold">{t("title") || "Google Sheets RefreshCw"}</h1>
           <p className="text-muted-foreground mt-1">
             {t("description") || "Dashboard metrics and sales data synced from Google Sheets"}
           </p>
         </div>
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Clock className="w-4 h-4" />
-          {lastSyncTime && (
+          {lastRefreshCwTime && (
             <span>
-              Last sync: {format(new Date(lastSyncTime), 'MMM d, yyyy HH:mm')}
+              Last sync: {format(new Date(lastRefreshCwTime), 'MMM d, yyyy HH:mm')}
               {syncFreshness && (
                 <Badge variant={syncFreshness > 60 ? "destructive" : syncFreshness > 30 ? "secondary" : "default"} className="ml-2">
                   {syncFreshness}m ago
@@ -131,7 +131,7 @@ export default async function GoogleSheetsSyncPage(props: Props) {
               )}
             </span>
           )}
-          {!lastSyncTime && <span>No sync data available</span>}
+          {!lastRefreshCwTime && <span>No sync data available</span>}
         </div>
       </div>
 
@@ -205,7 +205,7 @@ export default async function GoogleSheetsSyncPage(props: Props) {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Sync className="w-5 h-5" />
+              <RefreshCw className="w-5 h-5" />
               Sales Data Comparison
             </CardTitle>
             <CardDescription>
