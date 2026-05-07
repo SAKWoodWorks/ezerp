@@ -22,6 +22,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
+import {
   Command,
   CommandEmpty,
   CommandGroup,
@@ -33,6 +40,7 @@ import { Loader2, Plus, Trash2, ChevronsUpDown, Check } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 // Type definitions
+// กำหนด Type ของข้อมูลต่างๆ ที่จะใช้ในฟอร์ม
 type Customer = { id: number; name: string }
 type ResponsiblePerson = { id: number; name: string }
 type Product = {
@@ -43,12 +51,24 @@ type Product = {
   width: number | null
   length: number | null
   thickness: number | null
+  // เพิ่มข้อมูลสำหรับ E-commerce
+  is_ecommerce_product: boolean
+  ecommerce_sizes: number[] | null
 }
 type Warehouse = { id: number; name: string }
+// type BillItem = {
+//   description: string
+//   quantity: number
+//   unitPrice: number
+// }
+// --- ปรับปรุง Type ของ BillItem ---
+// เพิ่ม productId และ ecommerce_size เพื่อเก็บข้อมูลสำหรับการขายออนไลน์
 type BillItem = {
+  productId: number | null // ID ของสินค้าที่เลือก
   description: string
   quantity: number
   unitPrice: number
+  ecommerce_size: number | null // ขนาดที่ตัดขาย (สำหรับ E-commerce)
 }
 
 interface Props {
@@ -68,12 +88,19 @@ export default function CashBillForm({
   const t = useTranslations("CashBillForm")
   const tCommon = useTranslations("Common")
 
-  // Form state
+  // --- State สำหรับจัดการข้อมูลในฟอร์ม ---
+  const [salesChannel, setSalesChannel] = useState("retail") // State สำหรับประเภทการขาย
   const [customerId, setCustomerId] = useState<string>("")
   const [responsiblePersonId, setResponsiblePersonId] = useState<string>("")
   const [warehouseId, setWarehouseId] = useState<string>("")
   const [items, setItems] = useState<BillItem[]>([
-    { description: "", quantity: 1, unitPrice: 0 },
+    {
+      productId: null,
+      description: "",
+      quantity: 1,
+      unitPrice: 0,
+      ecommerce_size: null,
+    },
   ])
   const [total, setTotal] = useState(0)
 
@@ -94,19 +121,21 @@ export default function CashBillForm({
     setTotal(newTotal)
   }
 
+  // ฟังก์ชันจัดการการเปลี่ยนแปลงข้อมูลในแต่ละแถวของรายการสินค้า
   const handleItemChange = (
     index: number,
     field: keyof BillItem,
-    value: string | number
+    value: string | number | null
   ) => {
     const newItems = [...items]
     const itemToUpdate = { ...newItems[index] }
-    // Check the field name to assign the correct type
-    if (field === "quantity" || field === "unitPrice") {
-      itemToUpdate[field] = Number(value) || 0 // Ensure value is a number
+
+    if (field === "productId" || field === "ecommerce_size") {
+      itemToUpdate[field] = value !== null ? Number(value) : null
+    } else if (field === "quantity" || field === "unitPrice") {
+      itemToUpdate[field] = Number(value)
     } else {
-      // field === 'description'
-      itemToUpdate[field] = String(value) // Ensure value is a string
+      itemToUpdate[field] = String(value)
     }
 
     newItems[index] = itemToUpdate
@@ -114,19 +143,32 @@ export default function CashBillForm({
     calculateTotal(newItems)
   }
 
-  const handleProductSelect = (index: number, productId: string) => {
-    const selectedProduct = products.find((p) => p.id === Number(productId))
-    if (selectedProduct) {
-      const newItems = [...items]
-      newItems[index].description = selectedProduct.name
-      newItems[index].unitPrice = selectedProduct.price
-      setItems(newItems)
-      calculateTotal(newItems)
+  // ฟังก์ชันเมื่อมีการเลือกสินค้าจาก Popover
+  const handleProductSelect = (index: number, product: Product) => {
+    const newItems = [...items]
+    newItems[index] = {
+      ...newItems[index],
+      productId: product.id,
+      description: product.name,
+      unitPrice: product.price,
+      ecommerce_size: null, // รีเซ็ตขนาดที่เลือกทุกครั้งที่เปลี่ยนสินค้า
     }
+    setItems(newItems)
+    calculateTotal(newItems)
   }
 
+  // ฟังก์ชันเพิ่มรายการสินค้าใหม่
   const addItem = () => {
-    setItems([...items, { description: "", quantity: 1, unitPrice: 0 }])
+    setItems([
+      ...items,
+      {
+        productId: null,
+        description: "",
+        quantity: 1,
+        unitPrice: 0,
+        ecommerce_size: null,
+      },
+    ])
   }
 
   const removeItem = (index: number) => {
@@ -135,11 +177,13 @@ export default function CashBillForm({
     calculateTotal(newItems)
   }
 
+  // ฟังก์ชันที่ทำงานเมื่อกดปุ่ม "บันทึก"
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
+    // แปลงข้อมูล State ต่างๆ ไปใส่ใน FormData ก่อนส่ง
     formData.append("items", JSON.stringify(items))
-
+    formData.append("salesChannel", salesChannel)
     if (customerId) formData.append("customerId", customerId)
     if (responsiblePersonId)
       formData.append("responsiblePersonId", responsiblePersonId)
@@ -157,7 +201,9 @@ export default function CashBillForm({
     <form onSubmit={handleSubmit}>
       <Card>
         <CardContent className="p-6 space-y-6">
+          {/* --- ส่วนเลือกข้อมูลทั่วไป --- */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* ... Popover สำหรับ Customer, Responsible Person, Warehouse ... */}
             <div className="space-y-2">
               <Label>{t("customerLabel")}</Label>
               <Popover
@@ -315,7 +361,20 @@ export default function CashBillForm({
                 </PopoverContent>
               </Popover>
             </div>
-
+            {/* --- เพิ่มช่องเลือกประเภทการขาย --- */}
+            <div className="space-y-2">
+              <Label>ประเภทการขาย</Label>
+              <Select value={salesChannel} onValueChange={setSalesChannel}>
+                <SelectTrigger>
+                  <SelectValue placeholder="เลือกประเภทการขาย" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="retail">ขายปลีก (Retail)</SelectItem>
+                  <SelectItem value="wholesale">ขายส่ง (Wholesale)</SelectItem>
+                  <SelectItem value="e-commerce">E-commerce</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="issueDate">{t("issueDateLabel")}</Label>
               <Input
@@ -328,6 +387,7 @@ export default function CashBillForm({
             </div>
           </div>
 
+          {/* --- ส่วนรายการสินค้า --- */}
           <Card>
             <CardHeader>
               <CardTitle>{t("itemsTitle")}</CardTitle>
@@ -339,6 +399,10 @@ export default function CashBillForm({
                     <TableHead className="w-2/5">
                       {tCommon("description")}
                     </TableHead>
+                    {/* เพิ่ม Head สำหรับขนาด ถ้าเป็น E-commerce */}
+                    {salesChannel === "e-commerce" && (
+                      <TableHead>ขนาด (cm)</TableHead>
+                    )}
                     <TableHead>{tCommon("quantity")}</TableHead>
                     <TableHead>{tCommon("price")}</TableHead>
                     <TableHead className="text-right">
@@ -348,109 +412,142 @@ export default function CashBillForm({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {items.map((item, index) => (
-                    <TableRow key={index}>
-                      <TableCell>
-                        <Popover
-                          open={openComboboxIndex === index}
-                          onOpenChange={(isOpen) =>
-                            setOpenComboboxIndex(isOpen ? index : null)
-                          }
-                        >
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              aria-expanded={openComboboxIndex === index}
-                              className="w-full justify-between"
-                            >
-                              {item.description || "เลือกสินค้า..."}
-                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
-                            <Command>
-                              <CommandInput placeholder="ค้นหาสินค้า..." />
-                              <CommandList>
-                                <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
-                                <CommandGroup>
-                                  {products.map((product) => (
-                                    <CommandItem
-                                      key={product.id}
-                                      value={product.name}
-                                      onSelect={() => {
-                                        handleProductSelect(
-                                          index,
-                                          String(product.id)
-                                        )
-                                        setOpenComboboxIndex(null)
-                                      }}
-                                    >
-                                      {product.name}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <Textarea
-                          value={item.description}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "description",
-                              e.target.value
-                            )
-                          }
-                          className="mt-1"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "quantity",
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Input
-                          type="number"
-                          step="0.01"
-                          value={item.unitPrice}
-                          onChange={(e) =>
-                            handleItemChange(
-                              index,
-                              "unitPrice",
-                              Number(e.target.value)
-                            )
-                          }
-                        />
-                      </TableCell>
-                      <TableCell className="text-right">
-                        {(item.quantity * item.unitPrice).toLocaleString(
-                          "en-US",
-                          { minimumFractionDigits: 2 }
+                  {items.map((item, index) => {
+                    // หาข้อมูลสินค้าที่ถูกเลือกในแถวนี้
+                    const selectedProduct = products.find(
+                      (p) => p.id === item.productId
+                    )
+                    // ตรวจสอบว่าควรแสดงช่องเลือกขนาดหรือไม่
+                    const showSizeSelector =
+                      salesChannel === "e-commerce" &&
+                      selectedProduct?.is_ecommerce_product
+
+                    return (
+                      <TableRow key={index}>
+                        <TableCell>
+                          {/* Popover สำหรับเลือกสินค้า */}
+                          <Popover
+                            open={openComboboxIndex === index}
+                            onOpenChange={(isOpen) =>
+                              setOpenComboboxIndex(isOpen ? index : null)
+                            }
+                          >
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between"
+                              >
+                                {item.description || "เลือกสินค้า..."}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                              <Command>
+                                <CommandInput placeholder="ค้นหาสินค้า..." />
+                                <CommandList>
+                                  <CommandEmpty>ไม่พบสินค้า</CommandEmpty>
+                                  <CommandGroup>
+                                    {products.map((product) => (
+                                      <CommandItem
+                                        key={product.id}
+                                        value={product.name}
+                                        onSelect={() => {
+                                          handleProductSelect(index, product)
+                                          setOpenComboboxIndex(null)
+                                        }}
+                                      >
+                                        {product.name}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                        </TableCell>
+
+                        {/* ช่องเลือกขนาด (จะแสดงเมื่อเงื่อนไขถูกต้อง) */}
+                        {salesChannel === "e-commerce" && (
+                          <TableCell>
+                            {showSizeSelector ? (
+                              <Select
+                                value={String(item.ecommerce_size || "")}
+                                onValueChange={(value) =>
+                                  handleItemChange(
+                                    index,
+                                    "ecommerce_size",
+                                    value
+                                  )
+                                }
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="เลือกขนาด" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  {selectedProduct?.ecommerce_sizes?.map(
+                                    (size) => (
+                                      <SelectItem
+                                        key={size}
+                                        value={String(size)}
+                                      >
+                                        {size} cm
+                                      </SelectItem>
+                                    )
+                                  )}
+                                </SelectContent>
+                              </Select>
+                            ) : (
+                              "-" // แสดง "-" ถ้าไม่ใช่สินค้า E-commerce
+                            )}
+                          </TableCell>
                         )}
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => removeItem(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                        <TableCell>
+                          <Input
+                            type="number"
+                            value={item.quantity}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "quantity",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
+                        <TableCell>
+                          <Input
+                            type="number"
+                            step="0.01"
+                            value={item.unitPrice}
+                            onChange={(e) =>
+                              handleItemChange(
+                                index,
+                                "unitPrice",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {(item.quantity * item.unitPrice).toLocaleString(
+                            "en-US",
+                            { minimumFractionDigits: 2 }
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => removeItem(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    )
+                  })}
                 </TableBody>
               </Table>
               <Button
@@ -466,6 +563,7 @@ export default function CashBillForm({
             </CardContent>
           </Card>
 
+          {/* --- ยอดรวมท้ายบิล --- */}
           <div className="text-right text-2xl font-bold">
             {t("totalAmount")}: ฿
             {total.toLocaleString("en-US", { minimumFractionDigits: 2 })}

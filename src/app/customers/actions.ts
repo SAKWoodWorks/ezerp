@@ -103,11 +103,11 @@ export async function deleteCustomer(customerId: number) {
 }
 interface CustomerData {
   name: string
-  tax_id: string
-  address: string
-  phone: string
-  line_id: string
-  responsible_person: string
+  tax_id: string | null
+  address: string | null
+  phone: string | null
+  line_id: string | null
+  responsible_person: string | null
 }
 // 2. Add the new import function
 export async function importCustomers(fileBase64: string) {
@@ -140,6 +140,7 @@ export async function importCustomers(fileBase64: string) {
         phone: row.phone ? String(row.phone) : null,
         line_id: row.line_id || null,
         address: row.address || null,
+        responsible_person: row.responsible_person || null,
       }))
     }
 

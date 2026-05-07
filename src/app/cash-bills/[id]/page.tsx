@@ -12,7 +12,7 @@ import {
   TableRow,
   TableFooter,
 } from "@/components/ui/table"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, ShoppingCart } from "lucide-react"
 import PrintButton from "./PrintButton" // Component สำหรับปุ่มพิมพ์
 
 // type Props = {
@@ -34,6 +34,7 @@ type BillItem = {
   description: string
   quantity: number
   unitPrice: number
+  ecommerce_size: number | null
 }
 
 type CashBill = {
@@ -44,6 +45,7 @@ type CashBill = {
   items: BillItem[]
   customers: CustomerInfo
   responsible_persons: ResponsiblePersonInfo
+  sales_channel: string // เพิ่ม field นี้
 }
 // -----------------------------------------
 
@@ -53,6 +55,12 @@ const formatDate = (dateString: string) =>
     month: "long",
     day: "numeric",
   })
+// ฟังก์ชันสำหรับแปลง sales_channel เป็นข้อความที่อ่านง่าย
+const formatSalesChannel = (channel: string) => {
+  if (channel === "e-commerce") return "E-commerce"
+  if (channel === "wholesale") return "ขายส่ง (Wholesale)"
+  return "ขายปลีก (Retail)"
+}
 
 //export default async function CashBillDetailPage({ params }: Props) {
 export default async function CashBillDetailPage(props: {
@@ -64,6 +72,7 @@ export default async function CashBillDetailPage(props: {
   const { id } = params
   const t = await getTranslations("CashBillDetailPage")
 
+  // อัปเดต Query ให้ดึง sales_channel มาด้วย
   const { data, error } = await supabase
     .from("cash_bills")
     .select(
@@ -105,6 +114,7 @@ export default async function CashBillDetailPage(props: {
             {t("title")} #{bill.bill_number}
           </h1>
         </div>
+        {/* ส่งข้อมูล bill ทั้งหมดไปให้ PrintButton */}
         <PrintButton bill={bill} />
       </div>
 
@@ -125,6 +135,22 @@ export default async function CashBillDetailPage(props: {
               </p>
             </div>
             <div className="text-right">
+              {/* --- เพิ่มการแสดงผลประเภทการขาย --- */}
+              <p className="flex items-center justify-end gap-2">
+                <ShoppingCart className="w-4 h-4 text-muted-foreground" />
+                <span className="font-semibold">ประเภทการขาย:</span>{" "}
+                {formatSalesChannel(bill.sales_channel)}
+              </p>
+              <p>
+                <span className="font-semibold">{t("issueDate")}:</span>{" "}
+                {formatDate(bill.issue_date)}
+              </p>
+              <p>
+                <span className="font-semibold">{t("responsiblePerson")}:</span>{" "}
+                {bill.responsible_persons?.name || "-"}
+              </p>
+            </div>
+            <div className="text-right">
               <p>
                 <span className="font-semibold">{t("issueDate")}:</span>{" "}
                 {formatDate(bill.issue_date)}
@@ -142,6 +168,10 @@ export default async function CashBillDetailPage(props: {
               <TableHeader>
                 <TableRow>
                   <TableHead>{t("tableHeaderItem")}</TableHead>
+                  {/* --- เพิ่มคอลัมน์ "ขนาด" ถ้าเป็น E-commerce --- */}
+                  {bill.sales_channel === "e-commerce" && (
+                    <TableHead className="text-center">ขนาด (cm)</TableHead>
+                  )}
                   <TableHead className="text-center">
                     {t("tableHeaderQuantity")}
                   </TableHead>
@@ -157,6 +187,12 @@ export default async function CashBillDetailPage(props: {
                 {items.map((item, index) => (
                   <TableRow key={index}>
                     <TableCell>{item.description}</TableCell>
+                    {/* --- เพิ่ม Cell สำหรับแสดงขนาด --- */}
+                    {bill.sales_channel === "e-commerce" && (
+                      <TableCell className="text-center">
+                        {item.ecommerce_size || "-"}
+                      </TableCell>
+                    )}
                     <TableCell className="text-center">
                       {item.quantity}
                     </TableCell>

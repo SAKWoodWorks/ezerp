@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react"
 import { useTranslations } from "next-intl"
-import { importCustomers } from "./actions"
+// Removed importCustomers import - now using API route
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -36,31 +36,31 @@ export default function ImportCustomerDialog() {
       return
     }
 
-    const reader = new FileReader()
-    reader.onload = (event) => {
-      const data = event.target?.result
-      if (data) {
-        // Convert ArrayBuffer to base64 string to pass to Server Action
-        const base64 = btoa(
-          new Uint8Array(data as ArrayBuffer).reduce(
-            (data, byte) => data + String.fromCharCode(byte),
-            ""
-          )
-        )
+    startTransition(async () => {
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
 
-        startTransition(async () => {
-          const result = await importCustomers(base64)
-          if (result.success) {
-            alert(`${t("importSuccess")}: ${result.count} ${t("records")}`)
-            setIsOpen(false)
-            setFile(null)
-          } else {
-            alert(`${tCommon("error")}: ${result.error}`)
-          }
+        const response = await fetch('/api/customers/import', {
+          method: 'POST',
+          body: formData
         })
+
+        const result = await response.json()
+
+        if (result.success) {
+          alert(`${t("importSuccess")}: ${result.count} ${t("records")}`)
+          setIsOpen(false)
+          setFile(null)
+          // Refresh the page to show new customers
+          window.location.reload()
+        } else {
+          alert(`${tCommon("error")}: ${result.error}`)
+        }
+      } catch (error) {
+        alert(`${tCommon("error")}: ${error instanceof Error ? error.message : "Unknown error"}`)
       }
-    }
-    reader.readAsArrayBuffer(file)
+    })
   }
 
   return (
