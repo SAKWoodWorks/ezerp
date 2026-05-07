@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useTranslations } from "next-intl"
-import { BarcodeScanner } from "@/components/barcode/BarcodeScanner"
+import BarcodeScanner from "@/components/barcode/BarcodeScanner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
